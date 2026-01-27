@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>thephysicsportal v1.2</title>
+    <title>thephysicsportal v1.3</title>
     <style>
         body { background-color: #f7f7f7; color: #333; font-family: "lucida grande", tahoma, verdana, arial, sans-serif; margin: 0; padding: 0; font-size: 11px; }
         .header { background-color: #3b5998; padding: 8px 15px; color: white; border-bottom: 1px solid #29487d; display: flex; align-items: flex-end; justify-content: space-between; }
@@ -19,11 +19,12 @@
         #player { position: absolute; top: -55px; left: 0; width: 100%; height: calc(100% + 110px); pointer-events: none; }
         .shield { position: absolute; top: 0; left: 0; width: 100%; height: 80%; z-index: 100; }
 
-        /* TIMELINE WITH TIMESTAMP */
         .timeline-wrapper { width: 100%; max-width: 640px; margin: 10px auto 0; display: flex; align-items: center; gap: 10px; }
         .timeline-container { flex-grow: 1; background: #eee; height: 10px; cursor: pointer; border: 1px solid #ccc; position: relative; }
         .progress-bar { background: #3b5998; height: 100%; width: 0%; transition: width 0.1s linear; }
-        #time-display { font-family: monospace; color: #666; font-size: 10px; min-width: 70px; text-align: right; }
+        
+        /* Wider time display for HH:MM:SS */
+        #time-display { font-family: monospace; color: #666; font-size: 10px; min-width: 110px; text-align: right; letter-spacing: 0.5px; }
 
         .custom-controls { margin: 5px auto 0; max-width: 640px; background: #eceff5; border: 1px solid #d8dfea; padding: 10px; display: flex; align-items: center; gap: 12px; }
         .fb-button { background: #3b5998; color: white; border: 1px solid #29487d; padding: 3px 8px; font-size: 10px; font-weight: bold; cursor: pointer; }
@@ -33,7 +34,7 @@
 <body>
 
     <div class="header">
-        <h1>thephysicsportal <span style="font-size: 12px; font-weight: normal; opacity: 0.8;">v1.2</span></h1>
+        <h1>thephysicsportal <span style="font-size: 12px; font-weight: normal; opacity: 0.8;">v1.3</span></h1>
         <div style="font-size: 11px;">home | search | browse</div>
     </div>
 
@@ -56,7 +57,7 @@
                 <div class="timeline-container" id="timeline" onclick="seek(event)">
                     <div class="progress-bar" id="progress"></div>
                 </div>
-                <div id="time-display">0:00 / 0:00</div>
+                <div id="time-display">00:00:00 / 00:00:00</div>
             </div>
 
             <div class="custom-controls">
@@ -95,11 +96,18 @@
             }
         }
 
+        // Updated formatTime for HH:MM:SS
         function formatTime(time) {
-            var mins = Math.floor(time / 60);
+            var hours = Math.floor(time / 3600);
+            var mins = Math.floor((time % 3600) / 60);
             var secs = Math.floor(time % 60);
-            if (secs < 10) secs = '0' + secs;
-            return mins + ":" + secs;
+
+            // Padding with leading zeros
+            var hDisplay = hours < 10 ? '0' + hours : hours;
+            var mDisplay = mins < 10 ? '0' + mins : mins;
+            var sDisplay = secs < 10 ? '0' + secs : secs;
+
+            return hDisplay + ":" + mDisplay + ":" + sDisplay;
         }
 
         function updateUI() {
