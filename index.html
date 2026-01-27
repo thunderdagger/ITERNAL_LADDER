@@ -138,6 +138,7 @@
         function handleSwitch(id, el) { 
             document.getElementById('landing-overlay').classList.add('hidden');
             player.loadVideoById(id);
+            // Title update handled by updateTitle() via onStateChange
             document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
             el.classList.add('active');
             wrapper.focus();
@@ -153,9 +154,12 @@
                         playerVars: { 'controls': 0, 'modestbranding': 1, 'rel': 0 },
                         events: { 
                             'onStateChange': (e) => { 
-                                if(e.data == 1) { startIdleTimer(); player.setPlaybackRate(parseFloat(currentSpeed)); } 
+                                if(e.data == 1) { 
+                                    startIdleTimer(); 
+                                    player.setPlaybackRate(parseFloat(currentSpeed)); 
+                                    updateTitle(); // Fetch title from YouTube data
+                                } 
                                 else { showUI(); }
-                                updateTitle(); 
                             }
                         }
                     });
@@ -174,7 +178,16 @@
             } 
         }
         function formatTime(t) { var h=Math.floor(t/3600), m=Math.floor((t%3600)/60), s=Math.floor(t%60); return (h<10?'0'+h:h)+":"+(m<10?'0'+m:m)+":"+(s<10?'0'+s:s); }
-        function updateTitle() { try { document.getElementById('current-video-title').innerText = player.getVideoData().title; } catch(e){} }
+        
+        function updateTitle() { 
+            try { 
+                var videoData = player.getVideoData();
+                if(videoData && videoData.title) {
+                    document.getElementById('current-video-title').innerText = videoData.title;
+                }
+            } catch(e){ console.log("Title not ready"); } 
+        }
+
         function playPause() { (player.getPlayerState()==1)?player.pauseVideo():player.playVideo(); }
         function goFullscreen() { if(!document.fullscreenElement) wrapper.requestFullscreen(); else document.exitFullscreen(); }
         function seek(e) { var r = e.currentTarget.getBoundingClientRect(); player.seekTo(player.getDuration()*((e.clientX-r.left)/r.width), true); }
