@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>thephysicsportal v3.1.7</title>
+    <title>thephysicsportal v3.1.8</title>
     <style>
         /* FB THEME & LAYOUT */
         body { background-color: #f7f7f7; color: #333; font-family: "lucida grande", tahoma, verdana, arial, sans-serif; margin: 0; padding: 0; font-size: 11px; overflow-x: hidden; }
@@ -30,26 +30,28 @@
         #player { position: absolute; top: -55px; left: 0; width: 100%; height: calc(100% + 110px); pointer-events: none; }
         .shield { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 50; }
         
+        /* TIMELINE (NO GLOW + BUFFER) */
+        .timeline-container { flex-grow: 1; background: #dddddd; height: 12px; cursor: pointer; border: 1px solid #999; position: relative; overflow: hidden; margin-bottom: 8px; }
+        .buffer-bar { position: absolute; background: #bbbbbb; height: 100%; width: 0%; z-index: 1; transition: width 0.3s; }
+        .progress-bar { position: absolute; background: #3b5998; height: 100%; width: 0%; z-index: 2; box-shadow: none; border-right: 1px solid #29487d; }
+        
         /* CONTROLS */
         .floating-ui { background: #eceff5; border-top: 1px solid #3b5998; padding: 10px; z-index: 100; transition: 0.4s ease; }
-        #master-player-wrapper:fullscreen .video-title-bar { position: absolute; top: 0; width: 100%; background: rgba(236,239,245,0.9); }
-        #master-player-wrapper:fullscreen .floating-ui { position: absolute; bottom: 0; width: 100%; background: rgba(236,239,245,0.9); box-sizing: border-box; }
+        #master-player-wrapper:fullscreen .video-title-bar { position: absolute; top: 0; width: 100%; background: rgba(236,239,245,0.95); }
+        #master-player-wrapper:fullscreen .floating-ui { position: absolute; bottom: 0; width: 100%; background: rgba(236,239,245,0.95); box-sizing: border-box; }
+        
         .hide-ui { cursor: none !important; }
         .hide-ui .video-title-bar { transform: translateY(-100%); opacity: 0; }
         .hide-ui .floating-ui { transform: translateY(100%); opacity: 0; }
         
-        .timeline-container { flex-grow: 1; background: #ccc; height: 10px; cursor: pointer; border: 1px solid #999; position: relative; overflow: hidden; margin-bottom: 8px; }
-        .progress-bar { position: absolute; background: #3b5998; height: 100%; width: 0%; z-index: 2; }
         .fb-button { background: #3b5998; color: white; border: 1px solid #29487d; padding: 4px 10px; font-size: 10px; font-weight: bold; cursor: pointer; }
-        
-        /* SPEED SELECTOR STYLE */
         .speed-control { font-size: 10px; font-weight: bold; color: #3b5998; margin: 0 10px; }
         .speed-select { font-size: 10px; border: 1px solid #bdc7d8; padding: 2px; background: #fff; cursor: pointer; }
     </style>
 </head>
 <body oncontextmenu="return false;">
 
-    <div class="header"><h1>thephysicsportal <span style="font-weight:normal; font-size:10px;">v3.1.7</span></h1></div>
+    <div class="header"><h1>thephysicsportal <span style="font-weight:normal; font-size:10px;">v3.1.8</span></h1></div>
 
     <div class="container">
         <div class="sidebar" id="main-sidebar">Initializing system...</div>
@@ -61,7 +63,10 @@
                 <div class="shield"></div>
             </div>
             <div class="floating-ui">
-                <div class="timeline-container" onclick="seek(event)"><div class="progress-bar" id="progress"></div></div>
+                <div class="timeline-container" onclick="seek(event)">
+                    <div class="buffer-bar" id="buffer"></div>
+                    <div class="progress-bar" id="progress"></div>
+                </div>
                 <div style="display:flex; align-items:center; gap:12px;">
                     <button class="fb-button" onclick="playPause()">PLAY / PAUSE</button>
                     
@@ -123,7 +128,6 @@
             document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
             el.classList.add('active');
             wrapper.focus();
-            // Re-apply current speed to new video
             setTimeout(() => player.setPlaybackRate(parseFloat(currentSpeed)), 1000);
         }
 
@@ -157,7 +161,17 @@
             if(player && player.setPlaybackRate) player.setPlaybackRate(parseFloat(val));
         }
 
-        function updateUI() { if(player && player.getDuration) { var c = player.getCurrentTime(), d = player.getDuration(); document.getElementById('progress').style.width = (c/d*100) + "%"; document.getElementById('time-display').innerText = formatTime(c) + " / " + formatTime(d); } }
+        function updateUI() { 
+            if(player && player.getDuration) { 
+                var c = player.getCurrentTime(), d = player.getDuration();
+                var b = player.getVideoLoadedFraction(); // Buffer logic
+                
+                document.getElementById('progress').style.width = (c/d*100) + "%";
+                document.getElementById('buffer').style.width = (b*100) + "%";
+                document.getElementById('time-display').innerText = formatTime(c) + " / " + formatTime(d); 
+            } 
+        }
+
         function formatTime(t) { var h=Math.floor(t/3600), m=Math.floor((t%3600)/60), s=Math.floor(t%60); return (h<10?'0'+h:h)+":"+(m<10?'0'+m:m)+":"+(s<10?'0'+s:s); }
         function updateTitle() { try { document.getElementById('current-video-title').innerText = player.getVideoData().title; } catch(e){} }
         function playPause() { (player.getPlayerState()==1)?player.pauseVideo():player.playVideo(); }
