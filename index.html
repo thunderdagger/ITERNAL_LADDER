@@ -30,19 +30,18 @@
         #player { position: absolute; top: -55px; left: 0; width: 100%; height: calc(100% + 110px); pointer-events: none; }
         .shield { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 50; }
         
-        /* TIMELINE (NO GLOW + BUFFER) */
-        .timeline-container { flex-grow: 1; background: #dddddd; height: 12px; cursor: pointer; border: 1px solid #999; position: relative; overflow: hidden; margin-bottom: 8px; }
-        .buffer-bar { position: absolute; background: #bbbbbb; height: 100%; width: 0%; z-index: 1; transition: width 0.3s; }
-        .progress-bar { position: absolute; background: #3b5998; height: 100%; width: 0%; z-index: 2; box-shadow: none; border-right: 1px solid #29487d; }
-        
         /* CONTROLS */
         .floating-ui { background: #eceff5; border-top: 1px solid #3b5998; padding: 10px; z-index: 100; transition: 0.4s ease; }
-        #master-player-wrapper:fullscreen .video-title-bar { position: absolute; top: 0; width: 100%; background: rgba(236,239,245,0.95); }
-        #master-player-wrapper:fullscreen .floating-ui { position: absolute; bottom: 0; width: 100%; background: rgba(236,239,245,0.95); box-sizing: border-box; }
-        
+        #master-player-wrapper:fullscreen .video-title-bar { position: absolute; top: 0; width: 100%; background: rgba(236,239,245,0.9); }
+        #master-player-wrapper:fullscreen .floating-ui { position: absolute; bottom: 0; width: 100%; background: rgba(236,239,245,0.9); box-sizing: border-box; }
         .hide-ui { cursor: none !important; }
         .hide-ui .video-title-bar { transform: translateY(-100%); opacity: 0; }
         .hide-ui .floating-ui { transform: translateY(100%); opacity: 0; }
+        
+        /* TIMELINE WITH BUFFER */
+        .timeline-container { flex-grow: 1; background: #ccc; height: 10px; cursor: pointer; border: 1px solid #999; position: relative; overflow: hidden; margin-bottom: 8px; }
+        .buffer-bar { position: absolute; background: #aaa; height: 100%; width: 0%; z-index: 1; transition: width 0.3s ease; }
+        .progress-bar { position: absolute; background: #3b5998; height: 100%; width: 0%; z-index: 2; }
         
         .fb-button { background: #3b5998; color: white; border: 1px solid #29487d; padding: 4px 10px; font-size: 10px; font-weight: bold; cursor: pointer; }
         .speed-control { font-size: 10px; font-weight: bold; color: #3b5998; margin: 0 10px; }
@@ -140,12 +139,8 @@
                         playerVars: { 'controls': 0, 'modestbranding': 1, 'rel': 0 },
                         events: { 
                             'onStateChange': (e) => { 
-                                if(e.data == 1) {
-                                    startIdleTimer();
-                                    player.setPlaybackRate(parseFloat(currentSpeed));
-                                } else {
-                                    showUI();
-                                }
+                                if(e.data == 1) { startIdleTimer(); player.setPlaybackRate(parseFloat(currentSpeed)); } 
+                                else { showUI(); }
                                 updateTitle(); 
                             }, 
                             'onReady': updateTitle 
@@ -161,13 +156,15 @@
             if(player && player.setPlaybackRate) player.setPlaybackRate(parseFloat(val));
         }
 
+        // UPDATED UI TO SHOW BUFFER
         function updateUI() { 
             if(player && player.getDuration) { 
-                var c = player.getCurrentTime(), d = player.getDuration();
-                var b = player.getVideoLoadedFraction(); // Buffer logic
+                var c = player.getCurrentTime(), 
+                    d = player.getDuration(),
+                    b = player.getVideoLoadedFraction(); // Gets buffer %
                 
                 document.getElementById('progress').style.width = (c/d*100) + "%";
-                document.getElementById('buffer').style.width = (b*100) + "%";
+                document.getElementById('buffer').style.width = (b*100) + "%"; // Updates buffer bar
                 document.getElementById('time-display').innerText = formatTime(c) + " / " + formatTime(d); 
             } 
         }
