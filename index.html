@@ -4,36 +4,30 @@
     <meta charset="UTF-8">
     <title>thephysicsportal | physics tutoring</title>
     <style>
-        /* 2005 Facebook Aesthetic */
         body { background-color: #f7f7f7; color: #333; font-family: "lucida grande", tahoma, verdana, arial, sans-serif; margin: 0; padding: 0; font-size: 11px; }
-        
-        /* The Classic Blue Header */
         .header { background-color: #3b5998; padding: 8px 15px; color: white; border-bottom: 1px solid #29487d; display: flex; align-items: flex-end; gap: 10px; }
         .header h1 { font-size: 18px; margin: 0; letter-spacing: -1px; font-weight: bold; }
-        .header-links { margin-bottom: 2px; }
-
-        .container { display: flex; max-width: 850px; margin: 20px auto; gap: 15px; }
-
-        /* Left Sidebar: Nav Style */
+        .container { display: flex; max-width: 950px; margin: 20px auto; gap: 15px; }
         .sidebar { width: 150px; flex-shrink: 0; }
         .side-box { background: white; border: 1px solid #d8dfea; margin-bottom: 10px; padding: 5px; }
         .side-header { background-color: #eceff5; padding: 3px 5px; color: #3b5998; font-weight: bold; margin-bottom: 5px; border-bottom: 1px solid #d8dfea; }
-        .nav-link { display: block; color: #3b5998; text-decoration: none; padding: 2px 5px; margin-bottom: 1px; }
+        .nav-link { display: block; color: #3b5998; text-decoration: none; padding: 2px 5px; margin-bottom: 1px; cursor: pointer; }
         .nav-link:hover { background-color: #eceff5; text-decoration: underline; }
         .nav-link.active { background-color: #3b5998; color: white; text-decoration: none; }
-
-        /* Main Content Box */
         .main-content { flex-grow: 1; background: white; border: 1px solid #d8dfea; padding: 15px; min-height: 500px; }
         .content-header { border-bottom: 1px solid #d8dfea; padding-bottom: 5px; margin-bottom: 15px; color: #3b5998; font-size: 14px; font-weight: bold; }
 
-        /* THE PLAYER: Shielded and Cropped */
+        /* THE PLAYER FIXES */
         .video-box { position: relative; width: 100%; aspect-ratio: 16/9; overflow: hidden; border: 1px solid #3b5998; background: #000; }
-        #player { position: absolute; top: -55px; left: 0; width: 100%; height: calc(100% + 110px); }
-        .shield { position: absolute; top: 0; left: 0; width: 100%; height: 85%; z-index: 100; cursor: default; }
+        
+        /* Shifting the video slightly less so the bottom controls are fully in view */
+        #player { position: absolute; top: -45px; left: 0; width: 100%; height: calc(100% + 45px); }
+        
+        /* SHIELD FIX: Now only covers the top 75%. The bottom 25% (controls) is clickable! */
+        .shield { position: absolute; top: 0; left: 0; width: 100%; height: 75%; z-index: 100; cursor: default; }
 
         .player-settings { margin-top: 15px; padding: 8px; background: #f2f2f2; border: 1px solid #ccc; display: flex; align-items: center; gap: 10px; font-weight: bold; color: #666; }
         select { font-size: 10px; border: 1px solid #bdc7d8; }
-
         .footer { text-align: center; margin: 30px 0; color: #888; font-size: 9px; }
     </style>
 </head>
@@ -41,20 +35,15 @@
 
     <div class="header">
         <h1>thephysicsportal</h1>
-        <div class="header-links">home search browse</div>
+        <div style="margin-bottom:2px;">home search browse</div>
     </div>
 
     <div class="container">
         <div class="sidebar">
             <div class="side-box">
                 <div class="side-header">My Courses</div>
-                <a href="#" class="nav-link active" onclick="loadVideo('6tLJsEfbVcY', this)">Test Lesson</a>
-                <a href="#" class="nav-link" onclick="loadVideo('GzY_iOnP3E8', this)">Lesson 1.1</a>
-            </div>
-            <div class="side-box">
-                <div class="side-header">Tools</div>
-                <span class="nav-link">Calculator</span>
-                <span class="nav-link">Formula Sheet</span>
+                <div class="nav-link active" onclick="loadVideo('6tLJsEfbVcY', this)">Test Lesson</div>
+                <div class="nav-link" onclick="loadVideo('GzY_iOnP3E8', this)">Lesson 1.1</div>
             </div>
         </div>
 
@@ -74,40 +63,27 @@
                     <option value="1.5">1.5x</option>
                     <option value="2">2.0x</option>
                 </select>
+                <span style="margin-left: 20px; color:#999; font-weight:normal;">[ Use bottom bar for Timeline / Fullscreen ]</span>
             </div>
-            
-            <p style="margin-top:20px; color:#555; line-height: 1.4;">
-                Welcome to the physics tutoring portal. Use the left navigation to switch between lessons. 
-                Use the settings gear inside the video player to change resolution.
-            </p>
         </div>
     </div>
 
-    <div class="footer">
-        thephysicsportal &copy; 2026
-    </div>
+    <div class="footer">thephysicsportal &copy; 2026</div>
 
     <script src="https://www.youtube.com/iframe_api"></script>
     <script>
         var player;
         function onYouTubeIframeAPIReady() {
             player = new YT.Player('player', {
-                videoId: '6tLJsEfbVcY', // Your Test ID
-                playerVars: { 
-                    'modestbranding': 1, 
-                    'rel': 0, 
-                    'controls': 1,
-                    'disablekb': 1 
-                }
+                videoId: '6tLJsEfbVcY',
+                playerVars: { 'modestbranding': 1, 'rel': 0, 'controls': 1, 'disablekb': 0 }
             });
         }
-
         function loadVideo(id, el) {
             player.loadVideoById(id);
             document.getElementById('current-title').innerText = el.innerText;
             document.querySelectorAll('.nav-link').forEach(link => link.classList.remove('active'));
             el.classList.add('active');
-            return false;
         }
     </script>
 </body>
