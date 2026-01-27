@@ -53,7 +53,7 @@
 </head>
 <body oncontextmenu="return false;">
 
-    <div class="header"><h1>theeternalladder <span style="font-weight:normal; font-size:10px;">v3.1.9</span></h1></div>
+    <div class="header"><h1>theeternalladder <span style="font-weight:normal; font-size:10px;">v3.2.1</span></h1></div>
 
     <div class="container">
         <div class="sidebar" id="main-sidebar">Fetching system data...</div>
@@ -148,41 +148,4 @@
                         playerVars: { 'controls': 0, 'modestbranding': 1, 'rel': 0 },
                         events: { 
                             'onStateChange': (e) => { 
-                                if(e.data == 1) { startIdleTimer(); player.setPlaybackRate(parseFloat(currentSpeed)); } 
-                                updateTitle(); 
-                            }
-                        }
-                    });
-                }
-            }, 100);
-            setInterval(updateUI, 500);
-        }
-
-        function setSpeed(val) { currentSpeed = val; if(player && player.setPlaybackRate) player.setPlaybackRate(parseFloat(val)); }
-        function updateUI() { 
-            if(player && player.getDuration) { 
-                var c = player.getCurrentTime(), d = player.getDuration(), b = player.getVideoLoadedFraction(); 
-                document.getElementById('progress').style.width = (c/d*100) + "%";
-                document.getElementById('buffer').style.width = (b*100) + "%";
-                document.getElementById('time-display').innerText = formatTime(c) + " / " + formatTime(d); 
-            } 
-        }
-        function formatTime(t) { var h=Math.floor(t/3600), m=Math.floor((t%3600)/60), s=Math.floor(t%60); return (h<10?'0'+h:h)+":"+(m<10?'0'+m:m)+":"+(s<10?'0'+s:s); }
-        function updateTitle() { try { document.getElementById('current-video-title').innerText = player.getVideoData().title; } catch(e){} }
-        function playPause() { (player.getPlayerState()==1)?player.pauseVideo():player.playVideo(); }
-        function goFullscreen() { if(!document.fullscreenElement) wrapper.requestFullscreen(); else document.exitFullscreen(); }
-        function seek(e) { var r = e.currentTarget.getBoundingClientRect(); player.seekTo(player.getDuration()*((e.clientX-r.left)/r.width), true); }
-        function startIdleTimer() { showUI(); clearTimeout(idleTimer); if (document.fullscreenElement) idleTimer = setTimeout(() => wrapper.classList.add('hide-ui'), 3000); }
-        function showUI() { wrapper.classList.remove('hide-ui'); }
-        
-        wrapper.addEventListener('mousemove', startIdleTimer);
-        wrapper.addEventListener('keydown', (e) => { 
-            if(e.code==="Space"){e.preventDefault(); playPause();} 
-            if(e.code==="KeyF") goFullscreen(); 
-            if(e.code==="ArrowRight") player.seekTo(player.getCurrentTime() + 10, true);
-            if(e.code==="ArrowLeft") player.seekTo(player.getCurrentTime() - 10, true);
-            startIdleTimer(); 
-        });
-    </script>
-</body>
-</html>
+                                if(e.data == 1) { startIdleTimer(); player.
