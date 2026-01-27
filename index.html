@@ -113,11 +113,11 @@
             const sb = document.getElementById('main-sidebar');
             let h = '';
             portalData.forEach(subject => {
-                h += `<div class="side-box"><div class="subject-header" onclick="toggle(event)">${subject.s}</div><div class="collapse-content">`;
+                h += `<div class="side-box"><div class="subject-header" onclick="toggle(event)">${subject.s} ⌵</div><div class="collapse-content">`;
                 subject.b.forEach(batch => {
-                    h += `<div class="batch-group"><div class="batch-title" onclick="toggle(event)">${batch.y}</div><div class="collapse-content">`;
+                    h += `<div class="batch-group"><div class="batch-title" onclick="toggle(event)">${batch.y} ⌵</div><div class="collapse-content">`;
                     batch.u.forEach(unit => {
-                        h += `<div class="unit-group"><div class="unit-title" onclick="toggle(event)">${unit.n}</div><div class="collapse-content">`;
+                        h += `<div class="unit-group"><div class="unit-title" onclick="toggle(event)">${unit.n} ⌵</div><div class="collapse-content">`;
                         unit.v.forEach(video => {
                             h += `<div class="nav-link" onclick="handleSwitch('${video.i}', this)">${video.t}</div>`;
                         });
