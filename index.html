@@ -2,15 +2,16 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>thephysicsportal v3.1.1</title>
+    <title>thephysicsportal v3.1.2</title>
     <script src="library.js"></script>
     <style>
-        /* Legacy CSS remains the same as v3.1.0 */
-        body { background-color: #f7f7f7; color: #333; font-family: "lucida grande", tahoma, verdana, arial, sans-serif; margin: 0; padding: 0; font-size: 11px; }
+        body { background-color: #f7f7f7; color: #333; font-family: "lucida grande", tahoma, verdana, arial, sans-serif; margin: 0; padding: 0; font-size: 11px; overflow-x: hidden; }
         .header { background-color: #3b5998; padding: 8px 15px; color: white; border-bottom: 1px solid #29487d; display: flex; align-items: flex-end; justify-content: space-between; }
         .header h1 { font-size: 18px; margin: 0; letter-spacing: -1px; font-weight: bold; }
         .container { display: flex; max-width: 1100px; margin: 20px auto; gap: 15px; }
-        .sidebar { width: 220px; flex-shrink: 0; max-height: 85vh; overflow-y: auto; user-select: none; }
+        
+        /* SIDEBAR PROTECTION */
+        .sidebar { width: 220px; flex-shrink: 0; max-height: 85vh; overflow-y: auto; user-select: none; -webkit-user-select: none; }
         .side-box { background: white; border: 1px solid #d8dfea; margin-bottom: 10px; padding: 0; }
         .subject-header { background-color: #eceff5; padding: 6px 10px; color: #3b5998; font-weight: bold; border-bottom: 1px solid #d8dfea; font-size: 12px; }
         .batch-group { padding: 5px 0 5px 10px; border-bottom: 1px solid #f0f0f0; }
@@ -20,15 +21,28 @@
         .nav-link { display: block; color: #3b5998; text-decoration: none; padding: 3px 5px 3px 15px; cursor: pointer; border-left: 2px solid transparent; }
         .nav-link:hover { background-color: #eff2f7; text-decoration: underline; }
         .nav-link.active { background-color: #3b5998; color: white; font-weight: bold; }
-        
-        #master-player-wrapper { position: relative; background: #fff; flex-grow: 1; border: 1px solid #d8dfea; display: flex; flex-direction: column; outline: none; }
-        .video-title-bar { background: #eceff5; border-bottom: 1px solid #d8dfea; padding: 8px 12px; z-index: 11; transition: 0.4s; }
+
+        /* PLAYER ENGINE */
+        #master-player-wrapper { position: relative; background: #fff; flex-grow: 1; border: 1px solid #d8dfea; display: flex; flex-direction: column; outline: none; overflow: hidden; }
+        .video-title-bar { background: #eceff5; border-bottom: 1px solid #d8dfea; padding: 8px 12px; z-index: 100; transition: transform 0.4s ease, opacity 0.4s ease; }
         .video-title-bar h2 { margin: 0; font-size: 13px; color: #3b5998; font-weight: bold; }
         .video-engine { position: relative; width: 100%; aspect-ratio: 16/9; overflow: hidden; background: #000; z-index: 1; }
         #player { position: absolute; top: -55px; left: 0; width: 100%; height: calc(100% + 110px); pointer-events: none; }
-        .shield { position: absolute; top: 0; left: 0; width: 100%; height: 80%; z-index: 2; }
-        .floating-ui { background: #eceff5; border-top: 1px solid #3b5998; padding: 10px; z-index: 10; transition: 0.4s; }
+        .shield { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 50; }
+        .floating-ui { background: #eceff5; border-top: 1px solid #3b5998; padding: 10px; z-index: 100; transition: transform 0.4s ease, opacity 0.4s ease; }
+
+        /* FULLSCREEN AUTO-HIDE FIX */
+        #master-player-wrapper:fullscreen .video-title-bar, 
+        #master-player-wrapper:-webkit-full-screen .video-title-bar { position: absolute; top: 0; left: 0; right: 0; background: rgba(236, 239, 245, 0.9); }
         
+        #master-player-wrapper:fullscreen .floating-ui, 
+        #master-player-wrapper:-webkit-full-screen .floating-ui { position: absolute; bottom: 0; left: 0; right: 0; background: rgba(236, 239, 245, 0.9); }
+
+        .hide-ui .video-title-bar { transform: translateY(-100%); opacity: 0; }
+        .hide-ui .floating-ui { transform: translateY(100%); opacity: 0; }
+        .hide-ui { cursor: none !important; }
+
+        /* CONTROLS */
         .timeline-wrapper { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
         .timeline-container { flex-grow: 1; background: #ccc; height: 10px; cursor: pointer; border: 1px solid #999; position: relative; overflow: hidden; }
         .buffer-bar { position: absolute; background: #bbb; height: 100%; width: 0%; z-index: 1; }
@@ -36,7 +50,7 @@
         #time-display { font-family: monospace; color: #333; font-size: 11px; min-width: 120px; text-align: right; }
         .custom-controls { display: flex; align-items: center; gap: 12px; }
         .fb-button { background: #3b5998; color: white; border: 1px solid #29487d; padding: 4px 10px; font-size: 10px; font-weight: bold; cursor: pointer; }
-        .shortcut-hint { color: #888; font-size: 9px; line-height: 1; margin-left: 10px; border-left: 1px solid #bdc7d8; padding-left: 10px; }
+        .shortcut-hint { color: #888; font-size: 9px; margin-left: 10px; border-left: 1px solid #bdc7d8; padding-left: 10px; }
         input[type=range] { -webkit-appearance: none; width: 60px; background: transparent; }
         input[type=range]::-webkit-slider-runnable-track { width: 100%; height: 5px; background: #bdc7d8; border-radius: 3px; }
         input[type=range]::-webkit-slider-thumb { height: 12px; width: 12px; border-radius: 6px; background: #3b5998; -webkit-appearance: none; margin-top: -3.5px; }
@@ -45,21 +59,21 @@
 <body oncontextmenu="return false;">
 
     <div class="header">
-        <h1>thephysicsportal <span style="font-size: 12px; font-weight: normal; opacity: 0.8;">v3.1.1</span></h1>
+        <h1>thephysicsportal <span style="font-size: 10px; font-weight: normal; opacity: 0.7;">v3.1.2</span></h1>
     </div>
 
     <div class="container">
-        <div class="sidebar" id="main-sidebar" oncontextmenu="return false;"></div>
+        <div class="sidebar" id="main-sidebar"></div>
 
         <div id="master-player-wrapper" tabindex="0">
-            <div class="video-title-bar"><h2 id="current-video-title">Select a lesson</h2></div>
+            <div class="video-title-bar"><h2 id="current-video-title">Select Lesson</h2></div>
             <div class="video-engine">
                 <div id="player"></div>
                 <div class="shield"></div>
             </div>
-            <div class="floating-ui" id="controls-bar">
+            <div class="floating-ui">
                 <div class="timeline-wrapper">
-                    <div class="timeline-container" id="timeline" onclick="seek(event)">
+                    <div class="timeline-container" onclick="seek(event)">
                         <div class="buffer-bar" id="buffer"></div>
                         <div class="progress-bar" id="progress"></div>
                     </div>
@@ -78,77 +92,73 @@
 
     <script src="https://www.youtube.com/iframe_api"></script>
     <script>
-        var player;
-        var progressInterval;
-        var idleTimer;
+        var player, progressInterval, idleTimer;
         const wrapper = document.getElementById('master-player-wrapper');
 
-        // Security: Obfuscation
-        function getSecureID(plainID) { return btoa(plainID); } 
-        function decodeSecureID(encodedID) { return atob(encodedID); }
-
         function buildSidebar() {
-            const sidebar = document.getElementById('main-sidebar');
-            let html = '';
-            videoLibrary.forEach((subject) => {
-                html += `<div class="side-box"><div class="subject-header">${subject.subject}</div>`;
-                subject.batches.forEach(batch => {
-                    html += `<div class="batch-group"><div class="batch-title">${batch.year}</div>`;
-                    batch.units.forEach(unit => {
-                        html += `<div class="unit-group"><div class="unit-title">${unit.unitName}</div>`;
-                        unit.videos.forEach(vid => {
-                            let scrambled = getSecureID(vid.id);
-                            html += `<div class="nav-link" onclick="handleVideoSwitch('${scrambled}', this)">${vid.title}</div>`;
+            const sb = document.getElementById('main-sidebar');
+            let h = '';
+            videoLibrary.forEach(s => {
+                h += `<div class="side-box"><div class="subject-header">${s.subject}</div>`;
+                s.batches.forEach(b => {
+                    h += `<div class="batch-group"><div class="batch-title">${b.year}</div>`;
+                    b.units.forEach(u => {
+                        h += `<div class="unit-group"><div class="unit-title">${u.unitName}</div>`;
+                        u.videos.forEach(v => {
+                            // v.id is ALREADY base64 from the library script
+                            h += `<div class="nav-link" onclick="handleSwitch('${v.id}', this)">${v.title}</div>`;
                         });
-                        html += `</div>`;
+                        h += `</div>`;
                     });
-                    html += `</div>`;
+                    h += `</div>`;
                 });
-                html += `</div>`;
+                h += `</div>`;
             });
-            sidebar.innerHTML = html;
+            sb.innerHTML = h;
         }
 
-        function handleVideoSwitch(scrambledID, el) {
-            let realID = decodeSecureID(scrambledID);
-            loadNewVideo(realID, el);
-        }
+        function handleSwitch(scrambled, el) { loadNewVideo(atob(scrambled), el); }
 
         function onYouTubeIframeAPIReady() {
             buildSidebar();
-            let firstID = videoLibrary[0].batches[0].units[0].videos[0].id;
             player = new YT.Player('player', {
-                videoId: firstID,
-                playerVars: { 'controls': 1, 'modestbranding': 1, 'rel': 0, 'vq': 'small' },
-                events: { 'onStateChange': onPlayerStateChange, 'onReady': () => { updateAutoTitle(); wrapper.focus(); } }
+                videoId: atob(videoLibrary[0].batches[0].units[0].videos[0].id),
+                playerVars: { 'controls': 0, 'modestbranding': 1, 'rel': 0 },
+                events: { 'onStateChange': onPlayerStateChange, 'onReady': () => { updateTitle(); wrapper.focus(); } }
             });
         }
 
-        // Logic for Player
-        function updateAutoTitle() {
-            try {
-                var videoData = player.getVideoData();
-                if (videoData && videoData.title) { document.getElementById('current-video-title').innerText = videoData.title; }
-            } catch (e) {}
+        function onPlayerStateChange(e) {
+            if (e.data == 1) { 
+                progressInterval = setInterval(updateUI, 500); 
+                startIdleTimer();
+            } else { 
+                clearInterval(progressInterval); 
+                showUI(); 
+            }
+            updateTitle();
         }
-        wrapper.addEventListener('keydown', function(e) {
-            if (e.code === "Space") { e.preventDefault(); playPause(); }
-            if (e.code === "ArrowRight") { player.seekTo(player.getCurrentTime() + 5, true); }
-            if (e.code === "ArrowLeft") { player.seekTo(player.getCurrentTime() - 5, true); }
-            if (e.code === "KeyF") { goFullscreen(); }
-        });
-        function resetIdleTimer() {
-            const isFullscreen = document.fullscreenElement || document.webkitFullscreenElement;
-            wrapper.classList.remove('hide-ui');
+
+        function startIdleTimer() {
+            showUI();
             clearTimeout(idleTimer);
-            if (isFullscreen && player.getPlayerState() === 1) { idleTimer = setTimeout(() => { wrapper.classList.add('hide-ui'); }, 3000); }
+            if (document.fullscreenElement && player.getPlayerState() === 1) {
+                idleTimer = setTimeout(hideUI, 3000);
+            }
         }
-        wrapper.addEventListener('mousemove', resetIdleTimer);
-        function onPlayerStateChange(event) {
-            if (event.data == 1 || event.data == -1) { updateAutoTitle(); }
-            if (event.data == 1) { progressInterval = setInterval(updateUI, 500); resetIdleTimer(); }
-            else { clearInterval(progressInterval); wrapper.classList.remove('hide-ui'); clearTimeout(idleTimer); }
-        }
+
+        function hideUI() { wrapper.classList.add('hide-ui'); }
+        function showUI() { wrapper.classList.remove('hide-ui'); }
+
+        wrapper.addEventListener('mousemove', startIdleTimer);
+        wrapper.addEventListener('keydown', (e) => {
+            if (e.code === "Space") { e.preventDefault(); playPause(); }
+            if (e.code === "ArrowRight") player.seekTo(player.getCurrentTime() + 5, true);
+            if (e.code === "ArrowLeft") player.seekTo(player.getCurrentTime() - 5, true);
+            if (e.code === "KeyF") goFullscreen();
+            startIdleTimer();
+        });
+
         function updateUI() {
             var curr = player.getCurrentTime(), dur = player.getDuration(), buff = player.getVideoLoadedFraction();
             if (dur > 0) {
@@ -161,14 +171,17 @@
             var h = Math.floor(t/3600), m = Math.floor((t%3600)/60), s = Math.floor(t%60);
             return (h<10?'0'+h:h)+":"+(m<10?'0'+m:m)+":"+(s<10?'0'+s:s);
         }
+        function updateTitle() { try { document.getElementById('current-video-title').innerText = player.getVideoData().title; } catch(e){} }
         function playPause() { (player.getPlayerState()==1)?player.pauseVideo():player.playVideo(); }
         function setSpeed(v) { player.setPlaybackRate(parseFloat(v)); }
         function setVolume(v) { player.setVolume(v); }
-        function seek(e) { var r = document.getElementById('timeline').getBoundingClientRect(); player.seekTo(player.getDuration()*((e.clientX-r.left)/r.width), true); }
-        function goFullscreen() { var el = document.getElementById('master-player-wrapper'); if(!document.fullscreenElement){if(el.requestFullscreen)el.requestFullscreen();else if(el.webkitRequestFullscreen)el.webkitRequestFullscreen();}else{document.exitFullscreen();}}
+        function seek(e) { var r = e.currentTarget.getBoundingClientRect(); player.seekTo(player.getDuration()*((e.clientX-r.left)/r.width), true); }
+        function goFullscreen() { 
+            if(!document.fullscreenElement) wrapper.requestFullscreen().catch(e=>console.log(e));
+            else document.exitFullscreen();
+        }
         function loadNewVideo(id, el) {
             player.loadVideoById(id);
-            document.getElementById('current-video-title').innerText = "Loading title...";
             document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
             el.classList.add('active');
             wrapper.focus();
