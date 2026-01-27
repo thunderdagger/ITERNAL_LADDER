@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>theeternalladder v3.2.2</title>
+    <title>theeternalladder v3.2.4</title>
     <style>
         /* BASE THEME */
         body { background-color: #f7f7f7; color: #333; font-family: "lucida grande", tahoma, verdana, arial, sans-serif; margin: 0; padding: 0; font-size: 11px; overflow-x: hidden; }
@@ -58,7 +58,7 @@
 </head>
 <body oncontextmenu="return false;">
 
-    <div class="header"><h1>theeternalladder <span style="font-weight:normal; font-size:10px;">v3.2.2</span></h1></div>
+    <div class="header"><h1>theeternalladder <span style="font-weight:normal; font-size:10px;">v3.2.4</span></h1></div>
 
     <div class="container">
         <div class="sidebar" id="main-sidebar">Fetching system data...</div>
@@ -138,11 +138,10 @@
         function handleSwitch(id, el) { 
             document.getElementById('landing-overlay').classList.add('hidden');
             player.loadVideoById(id);
-            // Title update handled by updateTitle() via onStateChange
             document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
             el.classList.add('active');
             wrapper.focus();
-            setTimeout(() => player.setPlaybackRate(parseFloat(currentSpeed)), 1000);
+            setTimeout(() => player.setPlaybackRate(parseFloat(currentSpeed)), 500);
         }
 
         function onYouTubeIframeAPIReady() {
@@ -151,15 +150,14 @@
                     clearInterval(waiter);
                     player = new YT.Player('player', {
                         videoId: portalData[0].b[0].u[0].v[0].i,
-                        playerVars: { 'controls': 0, 'modestbranding': 1, 'rel': 0 },
+                        playerVars: { 'controls': 0, 'modestbranding': 1, 'rel': 0, 'enablejsapi': 1 },
                         events: { 
                             'onStateChange': (e) => { 
                                 if(e.data == 1) { 
                                     startIdleTimer(); 
                                     player.setPlaybackRate(parseFloat(currentSpeed)); 
-                                    updateTitle(); // Fetch title from YouTube data
                                 } 
-                                else { showUI(); }
+                                updateTitle(); // Restored v3.1.9 behavior
                             }
                         }
                     });
@@ -181,11 +179,9 @@
         
         function updateTitle() { 
             try { 
-                var videoData = player.getVideoData();
-                if(videoData && videoData.title) {
-                    document.getElementById('current-video-title').innerText = videoData.title;
-                }
-            } catch(e){ console.log("Title not ready"); } 
+                var title = player.getVideoData().title;
+                if(title) document.getElementById('current-video-title').innerText = title;
+            } catch(e){} 
         }
 
         function playPause() { (player.getPlayerState()==1)?player.pauseVideo():player.playVideo(); }
