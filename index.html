@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>thephysicsportal v2.1.0</title>
+    <title>thephysicsportal v2.1.1</title>
     <style>
         body { background-color: #f7f7f7; color: #333; font-family: "lucida grande", tahoma, verdana, arial, sans-serif; margin: 0; padding: 0; font-size: 11px; }
         .header { background-color: #3b5998; padding: 8px 15px; color: white; border-bottom: 1px solid #29487d; display: flex; align-items: flex-end; justify-content: space-between; }
@@ -15,44 +15,18 @@
         .nav-link { display: block; color: #3b5998; text-decoration: none; padding: 3px 5px; cursor: pointer; }
         .nav-link.active { background-color: #3b5998; color: white; }
 
-        /* MASTER WRAPPER */
         #master-player-wrapper { position: relative; background: #fff; flex-grow: 1; border: 1px solid #d8dfea; display: flex; flex-direction: column; }
-        
-        /* VIDEO AREA */
         .video-engine { position: relative; width: 100%; aspect-ratio: 16/9; overflow: hidden; background: #000; z-index: 1; }
         #player { position: absolute; top: -55px; left: 0; width: 100%; height: calc(100% + 110px); pointer-events: none; }
         .shield { position: absolute; top: 0; left: 0; width: 100%; height: 80%; z-index: 2; }
 
-        /* CONTROLS (Normal View: Under the video) */
-        .floating-ui {
-            background: #eceff5;
-            border-top: 1px solid #3b5998;
-            padding: 10px;
-            z-index: 10;
-            transition: transform 0.4s ease, opacity 0.4s ease;
-        }
+        .floating-ui { background: #eceff5; border-top: 1px solid #3b5998; padding: 10px; z-index: 10; transition: transform 0.4s ease, opacity 0.4s ease; }
 
-        /* --- FULLSCREEN CINEMA LOGIC --- */
         #master-player-wrapper:fullscreen { background: #000; border: none; width: 100vw; height: 100vh; justify-content: center; }
-        #master-player-wrapper:fullscreen .video-engine { max-width: 100%; height: 100%; }
-
-        /* Make controls FLOAT only when in fullscreen */
-        #master-player-wrapper:fullscreen .floating-ui {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background: rgba(236, 239, 245, 0.92);
-        }
-
-        /* Hide logic for fullscreen only */
+        #master-player-wrapper:fullscreen .floating-ui { position: absolute; bottom: 0; left: 0; right: 0; background: rgba(236, 239, 245, 0.92); }
         #master-player-wrapper:fullscreen.hide-ui { cursor: none; }
-        #master-player-wrapper:fullscreen.hide-ui .floating-ui {
-            transform: translateY(100%);
-            opacity: 0;
-        }
+        #master-player-wrapper:fullscreen.hide-ui .floating-ui { transform: translateY(100%); opacity: 0; }
 
-        /* UI ELEMENTS */
         .timeline-wrapper { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
         .timeline-container { flex-grow: 1; background: #ddd; height: 10px; cursor: pointer; border: 1px solid #999; position: relative; }
         .progress-bar { background: #3b5998; height: 100%; width: 0%; transition: width 0.1s linear; }
@@ -60,13 +34,19 @@
 
         .custom-controls { display: flex; align-items: center; gap: 15px; }
         .fb-button { background: #3b5998; color: white; border: 1px solid #29487d; padding: 4px 12px; font-size: 11px; font-weight: bold; cursor: pointer; }
-        select, input { font-size: 11px; border: 1px solid #bdc7d8; }
+        
+        /* Styled Volume Slider */
+        input[type=range] { -webkit-appearance: none; width: 70px; background: transparent; }
+        input[type=range]::-webkit-slider-runnable-track { width: 100%; height: 6px; cursor: pointer; background: #bdc7d8; border-radius: 3px; }
+        input[type=range]::-webkit-slider-thumb { height: 14px; width: 14px; border-radius: 7px; background: #3b5998; cursor: pointer; -webkit-appearance: none; margin-top: -4px; }
+
+        select { font-size: 11px; border: 1px solid #bdc7d8; padding: 2px; }
     </style>
 </head>
 <body>
 
     <div class="header">
-        <h1>thephysicsportal <span style="font-size: 12px; font-weight: normal; opacity: 0.8;">v2.1.0</span></h1>
+        <h1>thephysicsportal <span style="font-size: 12px; font-weight: normal; opacity: 0.8;">v2.1.1</span></h1>
         <div style="font-size: 11px;">home | search | browse</div>
     </div>
 
@@ -102,7 +82,7 @@
                             <option value="2">2x</option>
                         </select>
                     </span>
-                    <span>VOL: <input type="range" min="0" max="100" value="100" oninput="setVolume(this.value)" style="width:70px;"></span>
+                    <span style="font-weight:bold; color:#3b5998; font-size:10px;">VOL: <input type="range" min="0" max="100" value="100" oninput="setVolume(this.value)"></span>
                     <button class="fb-button" onclick="goFullscreen()" style="margin-left:auto;">FULL SCREEN</button>
                 </div>
             </div>
@@ -128,11 +108,8 @@
             const isFullscreen = document.fullscreenElement || document.webkitFullscreenElement;
             wrapper.classList.remove('hide-ui');
             clearTimeout(idleTimer);
-
             if (isFullscreen && player.getPlayerState() === 1) {
-                idleTimer = setTimeout(() => {
-                    wrapper.classList.add('hide-ui');
-                }, 3000);
+                idleTimer = setTimeout(() => { wrapper.classList.add('hide-ui'); }, 3000);
             }
         }
 
@@ -154,17 +131,14 @@
             var hours = Math.floor(time / 3600);
             var mins = Math.floor((time % 3600) / 60);
             var secs = Math.floor(time % 60);
-            return (hours < 10 ? '0' + hours : hours) + ":" + 
-                   (mins < 10 ? '0' + mins : mins) + ":" + 
-                   (secs < 10 ? '0' + secs : secs);
+            return (hours < 10 ? '0' + hours : hours) + ":" + (mins < 10 ? '0' + mins : mins) + ":" + (secs < 10 ? '0' + secs : secs);
         }
 
         function updateUI() {
             var curr = player.getCurrentTime();
             var dur = player.getDuration();
             if (dur > 0) {
-                var perc = (curr / dur) * 100;
-                document.getElementById('progress').style.width = perc + "%";
+                document.getElementById('progress').style.width = (curr / dur * 100) + "%";
                 document.getElementById('time-display').innerText = formatTime(curr) + " / " + formatTime(dur);
             }
         }
