@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>thephysicsportal v1.4</title>
+    <title>thephysicsportal v1.5</title>
     <style>
         body { background-color: #f7f7f7; color: #333; font-family: "lucida grande", tahoma, verdana, arial, sans-serif; margin: 0; padding: 0; font-size: 11px; }
         .header { background-color: #3b5998; padding: 8px 15px; color: white; border-bottom: 1px solid #29487d; display: flex; align-items: flex-end; justify-content: space-between; }
@@ -16,23 +16,43 @@
         .nav-link { display: block; color: #3b5998; text-decoration: none; padding: 3px 5px; cursor: pointer; }
         .nav-link.active { background-color: #3b5998; color: white; }
 
-        /* THE MASTER WRAPPER (This is what goes Full Screen) */
-        #master-player-wrapper { background: white; padding: 10px; border: 1px solid #d8dfea; flex-grow: 1; }
+        /* THE MASTER WRAPPER */
+        #master-player-wrapper { position: relative; background: #000; flex-grow: 1; overflow: hidden; border: 1px solid #d8dfea; line-height: 0; }
         
-        /* When in full screen mode, make background black and center content */
-        #master-player-wrapper:fullscreen { background: #000; padding: 20px; display: flex; flex-direction: column; justify-content: center; }
-        #master-player-wrapper:-webkit-full-screen { background: #000; padding: 20px; }
+        /* FULLSCREEN ADJUSTMENTS */
+        #master-player-wrapper:fullscreen { border: none; width: 100vw; height: 100vh; }
+        #master-player-wrapper:fullscreen .video-engine { max-width: 100%; height: 100%; border: none; }
 
-        .video-engine { position: relative; width: 100%; max-width: 854px; aspect-ratio: 16/9; overflow: hidden; background: #000; border: 1px solid #3b5998; margin: 0 auto; }
+        .video-engine { position: relative; width: 100%; max-width: 854px; aspect-ratio: 16/9; overflow: hidden; background: #000; margin: 0 auto; z-index: 1; }
         #player { position: absolute; top: -55px; left: 0; width: 100%; height: calc(100% + 110px); pointer-events: none; }
-        .shield { position: absolute; top: 0; left: 0; width: 100%; height: 80%; z-index: 100; }
+        .shield { position: absolute; top: 0; left: 0; width: 100%; height: 80%; z-index: 2; }
 
-        .timeline-wrapper { width: 100%; max-width: 854px; margin: 10px auto 0; display: flex; align-items: center; gap: 10px; background: #fff; padding: 5px; }
-        .timeline-container { flex-grow: 1; background: #eee; height: 12px; cursor: pointer; border: 1px solid #ccc; position: relative; }
+        /* FLOATING CONTROLS (Hidden by default) */
+        .floating-ui {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(236, 239, 245, 0.95); /* Early Facebook Blue-Grey with transparency */
+            border-top: 1px solid #3b5998;
+            padding: 10px;
+            z-index: 10;
+            transform: translateY(100%); /* Hide below the edge */
+            transition: transform 0.3s ease-in-out;
+            line-height: normal;
+        }
+
+        /* Show UI when hovering over the bottom of the player */
+        #master-player-wrapper:hover .floating-ui {
+            transform: translateY(0);
+        }
+
+        .timeline-wrapper { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+        .timeline-container { flex-grow: 1; background: #ddd; height: 10px; cursor: pointer; border: 1px solid #999; position: relative; }
         .progress-bar { background: #3b5998; height: 100%; width: 0%; transition: width 0.1s linear; }
-        #time-display { font-family: monospace; color: #666; font-size: 11px; min-width: 120px; text-align: right; }
+        #time-display { font-family: monospace; color: #333; font-size: 11px; min-width: 120px; text-align: right; }
 
-        .custom-controls { margin: 5px auto 0; max-width: 854px; background: #eceff5; border: 1px solid #d8dfea; padding: 10px; display: flex; align-items: center; gap: 15px; }
+        .custom-controls { display: flex; align-items: center; gap: 15px; }
         .fb-button { background: #3b5998; color: white; border: 1px solid #29487d; padding: 4px 12px; font-size: 11px; font-weight: bold; cursor: pointer; }
         select, input { font-size: 11px; border: 1px solid #bdc7d8; }
     </style>
@@ -40,7 +60,7 @@
 <body>
 
     <div class="header">
-        <h1>thephysicsportal <span style="font-size: 12px; font-weight: normal; opacity: 0.8;">v1.4</span></h1>
+        <h1>thephysicsportal <span style="font-size: 12px; font-weight: normal; opacity: 0.8;">v1.5</span></h1>
         <div style="font-size: 11px;">home | search | browse</div>
     </div>
 
@@ -59,24 +79,26 @@
                 <div class="shield" oncontextmenu="return false;"></div>
             </div>
 
-            <div class="timeline-wrapper">
-                <div class="timeline-container" id="timeline" onclick="seek(event)">
-                    <div class="progress-bar" id="progress"></div>
+            <div class="floating-ui">
+                <div class="timeline-wrapper">
+                    <div class="timeline-container" id="timeline" onclick="seek(event)">
+                        <div class="progress-bar" id="progress"></div>
+                    </div>
+                    <div id="time-display">00:00:00 / 00:00:00</div>
                 </div>
-                <div id="time-display">00:00:00 / 00:00:00</div>
-            </div>
 
-            <div class="custom-controls">
-                <button class="fb-button" onclick="playPause()">PLAY / PAUSE</button>
-                <span style="font-weight:bold; color:#3b5998;">SPD: 
-                    <select onchange="setSpeed(this.value)">
-                        <option value="1">1x</option>
-                        <option value="1.5">1.5x</option>
-                        <option value="2">2x</option>
-                    </select>
-                </span>
-                <span style="font-weight:bold; color:#3b5998;">VOL: <input type="range" min="0" max="100" value="100" oninput="setVolume(this.value)" style="width:70px;"></span>
-                <button class="fb-button" onclick="goFullscreen()" style="margin-left:auto;">FULL SCREEN</button>
+                <div class="custom-controls">
+                    <button class="fb-button" onclick="playPause()">PLAY / PAUSE</button>
+                    <span style="font-weight:bold; color:#3b5998;">SPD: 
+                        <select onchange="setSpeed(this.value)">
+                            <option value="1">1x</option>
+                            <option value="1.5">1.5x</option>
+                            <option value="2">2x</option>
+                        </select>
+                    </span>
+                    <span style="font-weight:bold; color:#3b5998;">VOL: <input type="range" min="0" max="100" value="100" oninput="setVolume(this.value)" style="width:70px;"></span>
+                    <button class="fb-button" onclick="goFullscreen()" style="margin-left:auto;">FULL SCREEN</button>
+                </div>
             </div>
         </div>
     </div>
@@ -130,13 +152,10 @@
         function setSpeed(v) { player.setPlaybackRate(parseFloat(v)); }
         function setVolume(v) { player.setVolume(v); }
 
-        // NEW FULLSCREEN LOGIC
         function goFullscreen() {
             var el = document.getElementById('master-player-wrapper');
             if (el.requestFullscreen) { el.requestFullscreen(); }
             else if (el.webkitRequestFullscreen) { el.webkitRequestFullscreen(); }
-            else if (el.mozRequestFullScreen) { el.mozRequestFullScreen(); }
-            else if (el.msRequestFullscreen) { el.msRequestFullscreen(); }
         }
 
         function loadNewVideo(id, el) {
