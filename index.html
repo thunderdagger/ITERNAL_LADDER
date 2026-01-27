@@ -2,9 +2,9 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>thephysicsportal v3.2.1</title>
+    <title>theeternalladder v3.2.5</title>
     <style>
-        /* BASE THEME - CLASSIC FB LOOK */
+        /* BASE THEME */
         body { background-color: #f7f7f7; color: #333; font-family: "lucida grande", tahoma, verdana, arial, sans-serif; margin: 0; padding: 0; font-size: 11px; overflow-x: hidden; }
         .header { background-color: #3b5998; padding: 8px 15px; color: white; border-bottom: 1px solid #29487d; display: flex; align-items: flex-end; justify-content: space-between; }
         .header h1 { font-size: 18px; margin: 0; letter-spacing: -1px; font-weight: bold; }
@@ -14,34 +14,20 @@
         .sidebar { width: 250px; flex-shrink: 0; max-height: 85vh; overflow-y: auto; user-select: none; }
         .side-box { background: white; border: 1px solid #d8dfea; margin-bottom: 5px; border-radius: 2px; overflow: hidden; }
         
-        /* LEVEL 1: SUBJECT */
-        .subject-header { 
-            background: #eceff5; padding: 10px; color: #3b5998; font-weight: bold; 
-            border-bottom: 1px solid #d8dfea; font-size: 12px; cursor: pointer;
-            display: flex; justify-content: space-between; align-items: center;
-        }
+        .subject-header { background: #eceff5; padding: 10px; color: #3b5998; font-weight: bold; border-bottom: 1px solid #d8dfea; font-size: 12px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
         .subject-header:hover { background: #dbe2ef; }
         
-        /* LEVEL 2: BATCH */
         .batch-content { display: none; background: #fff; }
         .batch-content.open { display: block; }
         .batch-group { border-bottom: 1px solid #f0f0f0; }
-        .batch-title { 
-            padding: 8px 10px; font-weight: bold; color: #666; font-size: 10px; 
-            text-transform: uppercase; cursor: pointer; background: #fafafa;
-        }
+        .batch-title { padding: 8px 10px; font-weight: bold; color: #666; font-size: 10px; text-transform: uppercase; cursor: pointer; background: #fafafa; }
         .batch-title:hover { background: #f0f2f5; color: #3b5998; }
 
-        /* LEVEL 3: UNIT (NEW COLLAPSE) */
         .unit-content { display: none; padding-bottom: 5px; }
         .unit-content.open { display: block; }
-        .unit-title { 
-            padding: 5px 20px; color: #3b5998; font-style: italic; font-weight: bold; 
-            font-size: 10px; cursor: pointer; border-left: 3px solid #d8dfea;
-        }
+        .unit-title { padding: 5px 20px; color: #3b5998; font-style: italic; font-weight: bold; font-size: 10px; cursor: pointer; border-left: 3px solid #d8dfea; }
         .unit-title:hover { background: #f0f2f5; border-left-color: #3b5998; }
 
-        /* LESSON LINKS */
         .nav-link { display: block; color: #3b5998; text-decoration: none; padding: 4px 5px 4px 35px; cursor: pointer; border-left: 2px solid transparent; }
         .nav-link:hover { background-color: #eff2f7; text-decoration: underline; }
         .nav-link.active { background-color: #3b5998; color: white !important; font-weight: bold; border-left: 2px solid #29487d; }
@@ -54,25 +40,28 @@
         #player { position: absolute; top: -55px; left: 0; width: 100%; height: calc(100% + 110px); pointer-events: none; }
         .shield { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 50; }
         
-        /* LANDING VIEW */
         #landing-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: #1a1a1a; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 60; color: white; text-align: center; }
         .portal-logo { font-size: 36px; font-weight: bold; letter-spacing: -2px; color: #3b5998; margin-bottom: 5px; }
         .start-hint { font-size: 13px; opacity: 0.7; }
         .hidden { display: none !important; }
 
-        /* CONTROLS */
         .floating-ui { background: #eceff5; border-top: 1px solid #3b5998; padding: 10px; z-index: 100; transition: 0.4s ease; }
+        #master-player-wrapper:fullscreen .video-title-bar { position: absolute; top: 0; width: 100%; background: rgba(236,239,245,0.9); }
+        #master-player-wrapper:fullscreen .floating-ui { position: absolute; bottom: 0; width: 100%; background: rgba(236,239,245,0.9); box-sizing: border-box; }
+        .hide-ui { cursor: none !important; }
+        .hide-ui .video-title-bar { transform: translateY(-100%); opacity: 0; }
+        .hide-ui .floating-ui { transform: translateY(100%); opacity: 0; }
+
         .timeline-container { flex-grow: 1; background: #ccc; height: 10px; cursor: pointer; border: 1px solid #999; position: relative; overflow: hidden; margin-bottom: 8px; }
         .buffer-bar { position: absolute; background: #aaa; height: 100%; width: 0%; z-index: 1; transition: width 0.3s ease; }
         .progress-bar { position: absolute; background: #3b5998; height: 100%; width: 0%; z-index: 2; }
-        
         .fb-button { background: #3b5998; color: white; border: 1px solid #29487d; padding: 4px 10px; font-size: 10px; font-weight: bold; cursor: pointer; }
         .speed-select { font-size: 10px; border: 1px solid #bdc7d8; padding: 2px; background: #fff; }
     </style>
 </head>
 <body oncontextmenu="return false;">
 
-    <div class="header"><h1>thephysicsportal <span style="font-weight:normal; font-size:10px;">v3.2.1</span></h1></div>
+    <div class="header"><h1>theeternalladder <span style="font-weight:normal; font-size:10px;">v3.2.5</span></h1></div>
 
     <div class="container">
         <div class="sidebar" id="main-sidebar">Loading system...</div>
@@ -83,10 +72,11 @@
                 <div id="player"></div>
                 <div class="shield"></div>
                 <div id="landing-overlay">
-                    <div class="portal-logo">thephysicsportal</div>
-                    <div class="start-hint">Select a subject and lesson to begin</div>
+                    <div class="portal-logo">theeternalladder</div>
+                    <div class="start-hint">Select a lesson from the sidebar to begin</div>
                 </div>
             </div>
+            
             <div class="floating-ui">
                 <div class="timeline-container" onclick="seek(event)">
                     <div class="buffer-bar" id="buffer"></div>
@@ -145,9 +135,7 @@
             sb.innerHTML = h;
         }
 
-        function toggle(id) {
-            document.getElementById(id).classList.toggle('open');
-        }
+        function toggle(id) { document.getElementById(id).classList.toggle('open'); }
 
         function handleSwitch(id, el) { 
             document.getElementById('landing-overlay').classList.add('hidden');
@@ -155,7 +143,7 @@
             document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
             el.classList.add('active');
             wrapper.focus();
-            setTimeout(() => player.setPlaybackRate(parseFloat(currentSpeed)), 1000);
+            setTimeout(() => player.setPlaybackRate(parseFloat(currentSpeed)), 500);
         }
 
         function onYouTubeIframeAPIReady() {
@@ -164,9 +152,12 @@
                     clearInterval(waiter);
                     player = new YT.Player('player', {
                         videoId: portalData[0].b[0].u[0].v[0].i,
-                        playerVars: { 'controls': 0, 'modestbranding': 1, 'rel': 0 },
+                        playerVars: { 'controls': 0, 'modestbranding': 1, 'rel': 0, 'enablejsapi': 1 },
                         events: { 
-                            'onStateChange': (e) => { if(e.data == 1) startIdleTimer(); else showUI(); updateTitle(); }, 
+                            'onStateChange': (e) => { 
+                                if(e.data == 1) startIdleTimer(); else showUI(); 
+                                updateTitle(); 
+                            }, 
                             'onReady': updateTitle 
                         }
                     });
@@ -176,6 +167,7 @@
         }
 
         function setSpeed(v) { currentSpeed = v; if(player) player.setPlaybackRate(parseFloat(v)); }
+        
         function updateUI() { 
             if(player && player.getDuration) { 
                 var c = player.getCurrentTime(), d = player.getDuration(), b = player.getVideoLoadedFraction(); 
@@ -184,8 +176,16 @@
                 document.getElementById('time-display').innerText = formatTime(c) + " / " + formatTime(d); 
             } 
         }
+
         function formatTime(t) { var h=Math.floor(t/3600), m=Math.floor((t%3600)/60), s=Math.floor(t%60); return (h<10?'0'+h:h)+":"+(m<10?'0'+m:m)+":"+(s<10?'0'+s:s); }
-        function updateTitle() { try { document.getElementById('current-video-title').innerText = player.getVideoData().title; } catch(e){} }
+        
+        function updateTitle() { 
+            try { 
+                var title = player.getVideoData().title;
+                if(title && title !== "") document.getElementById('current-video-title').innerText = title;
+            } catch(e){} 
+        }
+
         function playPause() { (player.getPlayerState()==1)?player.pauseVideo():player.playVideo(); }
         function goFullscreen() { if(!document.fullscreenElement) wrapper.requestFullscreen(); else document.exitFullscreen(); }
         function seek(e) { var r = e.currentTarget.getBoundingClientRect(); player.seekTo(player.getDuration()*((e.clientX-r.left)/r.width), true); }
