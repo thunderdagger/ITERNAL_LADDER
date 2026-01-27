@@ -1,4 +1,4 @@
-// library.js - The Physics Portal Video Database
+/* thephysicsportal-data v1.0.1 */
 const videoLibrary = [
     {
         subject: "Physics",
@@ -12,31 +12,10 @@ const videoLibrary = [
                             { id: "6tLJsEfbVcY", title: "Introduction to Motion" },
                             { id: "GzY_iOnP3E8", title: "Lesson 1.1: Kinematics" }
                         ]
-                    },
-                    {
-                        unitName: "Heat",
-                        videos: [
-                            { id: "dQw4w9WgXcQ", title: "Thermal Physics Part 1" }
-                        ]
-                    }
-                ]
-            }
-        ]
-    },
-    {
-        subject: "Combined Math",
-        batches: [
-            {
-                year: "2026 Revision",
-                units: [
-                    {
-                        unitName: "Integration",
-                        videos: [
-                            { id: "3f90c3", title: "Day 13: Integration Basics" }
-                        ]
                     }
                 ]
             }
         ]
     }
+    // Add your other subjects here following the same structure
 ];
