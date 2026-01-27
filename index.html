@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>thephysicsportal v1.6</title>
+    <title>thephysicsportal v2.0.0</title>
     <style>
         body { background-color: #f7f7f7; color: #333; font-family: "lucida grande", tahoma, verdana, arial, sans-serif; margin: 0; padding: 0; font-size: 11px; }
         .header { background-color: #3b5998; padding: 8px 15px; color: white; border-bottom: 1px solid #29487d; display: flex; align-items: flex-end; justify-content: space-between; }
@@ -18,11 +18,12 @@
         /* MASTER WRAPPER */
         #master-player-wrapper { position: relative; background: #000; flex-grow: 1; overflow: hidden; border: 1px solid #d8dfea; line-height: 0; cursor: default; }
         
-        /* Hide cursor when controls are hidden */
-        #master-player-wrapper.hide-ui { cursor: none; }
-
+        /* FULLSCREEN STATE STYLES */
         #master-player-wrapper:fullscreen { border: none; width: 100vw; height: 100vh; }
         #master-player-wrapper:fullscreen .video-engine { max-width: 100%; height: 100%; border: none; }
+        
+        /* Only hide cursor in fullscreen AND when hide-ui class is present */
+        #master-player-wrapper:fullscreen.hide-ui { cursor: none; }
 
         .video-engine { position: relative; width: 100%; max-width: 854px; aspect-ratio: 16/9; overflow: hidden; background: #000; margin: 0 auto; z-index: 1; }
         #player { position: absolute; top: -55px; left: 0; width: 100%; height: calc(100% + 110px); pointer-events: none; }
@@ -34,7 +35,7 @@
             bottom: 0;
             left: 0;
             right: 0;
-            background: rgba(236, 239, 245, 0.92);
+            background: rgba(236, 239, 245, 0.95);
             border-top: 1px solid #3b5998;
             padding: 10px;
             z-index: 10;
@@ -44,8 +45,8 @@
             opacity: 1;
         }
 
-        /* The class that hides the UI */
-        .hide-ui .floating-ui {
+        /* ONLY HIDE IF FULLSCREEN AND IDLE */
+        #master-player-wrapper:fullscreen.hide-ui .floating-ui {
             transform: translateY(100%);
             opacity: 0;
         }
@@ -63,14 +64,14 @@
 <body>
 
     <div class="header">
-        <h1>thephysicsportal <span style="font-size: 12px; font-weight: normal; opacity: 0.8;">v1.6</span></h1>
+        <h1>thephysicsportal <span style="font-size: 12px; font-weight: normal; opacity: 0.8;">v2.0.0</span></h1>
         <div style="font-size: 11px;">home | search | browse</div>
     </div>
 
     <div class="container">
         <div class="sidebar">
             <div class="side-box">
-                <div class="side-header">Unit 1 Lessons</div>
+                <div class="side-header">Physics Units</div>
                 <div class="nav-link active" onclick="loadNewVideo('6tLJsEfbVcY', this)">Test Lesson</div>
                 <div class="nav-link" onclick="loadNewVideo('GzY_iOnP3E8', this)">Lesson 1.1</div>
             </div>
@@ -79,7 +80,7 @@
         <div id="master-player-wrapper">
             <div class="video-engine">
                 <div id="player"></div>
-                <div class="shield" oncontextmenu="return false;"></div>
+                <div class="shield" oncontextmenu="false;"></div>
             </div>
 
             <div class="floating-ui" id="controls-bar">
@@ -92,14 +93,14 @@
 
                 <div class="custom-controls">
                     <button class="fb-button" onclick="playPause()">PLAY / PAUSE</button>
-                    <span style="font-weight:bold; color:#3b5998;">SPD: 
+                    <span>SPD: 
                         <select onchange="setSpeed(this.value)">
                             <option value="1">1x</option>
                             <option value="1.5">1.5x</option>
                             <option value="2">2x</option>
                         </select>
                     </span>
-                    <span style="font-weight:bold; color:#3b5998;">VOL: <input type="range" min="0" max="100" value="100" oninput="setVolume(this.value)" style="width:70px;"></span>
+                    <span>VOL: <input type="range" min="0" max="100" value="100" oninput="setVolume(this.value)" style="width:70px;"></span>
                     <button class="fb-button" onclick="goFullscreen()" style="margin-left:auto;">FULL SCREEN</button>
                 </div>
             </div>
@@ -121,14 +122,23 @@
             });
         }
 
-        // --- AUTO-HIDE LOGIC ---
+        // --- ENHANCED AUTO-HIDE LOGIC ---
         function resetIdleTimer() {
+            // Check if we are actually in Fullscreen mode
+            const isFullscreen = document.fullscreenElement || document.webkitFullscreenElement;
+            
             wrapper.classList.remove('hide-ui');
             clearTimeout(idleTimer);
-            // Auto-hide after 3 seconds of no movement
-            idleTimer = setTimeout(() => {
-                wrapper.classList.add('hide-ui');
-            }, 3000);
+
+            // Only start the 3s countdown if the user is in Fullscreen
+            if (isFullscreen) {
+                idleTimer = setTimeout(() => {
+                    // Only hide if the video is actually playing
+                    if (player.getPlayerState() === 1) {
+                        wrapper.classList.add('hide-ui');
+                    }
+                }, 3000);
+            }
         }
 
         wrapper.addEventListener('mousemove', resetIdleTimer);
@@ -140,7 +150,7 @@
                 resetIdleTimer();
             } else {
                 clearInterval(progressInterval);
-                wrapper.classList.remove('hide-ui'); // Keep UI visible if paused
+                wrapper.classList.remove('hide-ui'); 
                 clearTimeout(idleTimer);
             }
         }
