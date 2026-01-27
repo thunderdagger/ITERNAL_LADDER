@@ -2,15 +2,15 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>thephysicsportal v3.2.1</title>
+    <title>theetarnalraven v4.0.0</title>
     <style>
-        /* BASE THEME - CLASSIC FB LOOK */
+        /* THEETARNALRAVEN CORE THEME */
         body { background-color: #f7f7f7; color: #333; font-family: "lucida grande", tahoma, verdana, arial, sans-serif; margin: 0; padding: 0; font-size: 11px; overflow-x: hidden; }
         .header { background-color: #3b5998; padding: 8px 15px; color: white; border-bottom: 1px solid #29487d; display: flex; align-items: flex-end; justify-content: space-between; }
         .header h1 { font-size: 18px; margin: 0; letter-spacing: -1px; font-weight: bold; }
         .container { display: flex; max-width: 1150px; margin: 20px auto; gap: 15px; padding: 0 10px; }
         
-        /* MULTI-LEVEL COLLAPSIBLE SIDEBAR */
+        /* TRIPLE-LEVEL ACCORDION SIDEBAR */
         .sidebar { width: 250px; flex-shrink: 0; max-height: 85vh; overflow-y: auto; user-select: none; }
         .side-box { background: white; border: 1px solid #d8dfea; margin-bottom: 5px; border-radius: 2px; overflow: hidden; }
         
@@ -32,7 +32,7 @@
         }
         .batch-title:hover { background: #f0f2f5; color: #3b5998; }
 
-        /* LEVEL 3: UNIT (NEW COLLAPSE) */
+        /* LEVEL 3: UNIT */
         .unit-content { display: none; padding-bottom: 5px; }
         .unit-content.open { display: block; }
         .unit-title { 
@@ -54,13 +54,13 @@
         #player { position: absolute; top: -55px; left: 0; width: 100%; height: calc(100% + 110px); pointer-events: none; }
         .shield { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 50; }
         
-        /* LANDING VIEW */
+        /* REBRANDED LANDING VIEW */
         #landing-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: #1a1a1a; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 60; color: white; text-align: center; }
         .portal-logo { font-size: 36px; font-weight: bold; letter-spacing: -2px; color: #3b5998; margin-bottom: 5px; }
         .start-hint { font-size: 13px; opacity: 0.7; }
         .hidden { display: none !important; }
 
-        /* CONTROLS */
+        /* CONTROLS & TIMELINE */
         .floating-ui { background: #eceff5; border-top: 1px solid #3b5998; padding: 10px; z-index: 100; transition: 0.4s ease; }
         .timeline-container { flex-grow: 1; background: #ccc; height: 10px; cursor: pointer; border: 1px solid #999; position: relative; overflow: hidden; margin-bottom: 8px; }
         .buffer-bar { position: absolute; background: #aaa; height: 100%; width: 0%; z-index: 1; transition: width 0.3s ease; }
@@ -72,10 +72,10 @@
 </head>
 <body oncontextmenu="return false;">
 
-    <div class="header"><h1>thephysicsportal <span style="font-weight:normal; font-size:10px;">v3.2.1</span></h1></div>
+    <div class="header"><h1>theetarnalraven <span style="font-weight:normal; font-size:10px;">v4.0.0</span></h1></div>
 
     <div class="container">
-        <div class="sidebar" id="main-sidebar">Loading system...</div>
+        <div class="sidebar" id="main-sidebar">Syncing system...</div>
         
         <div id="master-player-wrapper" tabindex="0">
             <div class="video-title-bar"><h2 id="current-video-title">Welcome</h2></div>
@@ -83,8 +83,8 @@
                 <div id="player"></div>
                 <div class="shield"></div>
                 <div id="landing-overlay">
-                    <div class="portal-logo">thephysicsportal</div>
-                    <div class="start-hint">Select a subject and lesson to begin</div>
+                    <div class="portal-logo">theetarnalraven</div>
+                    <div class="start-hint">Select a curriculum unit to begin stream</div>
                 </div>
             </div>
             <div class="floating-ui">
@@ -145,9 +145,7 @@
             sb.innerHTML = h;
         }
 
-        function toggle(id) {
-            document.getElementById(id).classList.toggle('open');
-        }
+        function toggle(id) { document.getElementById(id).classList.toggle('open'); }
 
         function handleSwitch(id, el) { 
             document.getElementById('landing-overlay').classList.add('hidden');
