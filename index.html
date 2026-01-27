@@ -116,7 +116,7 @@
 
         function buildSidebar() {
             const sb = document.getElementById('main-sidebar');
-            let h = '';
+            let h = '<div class="side-box"><div class="subject-header">Welcome</div></div>';
             portalData.forEach(subject => {
                 h += `<div class="side-box"><div class="subject-header" onclick="toggle(event)">${subject.s} ⌵</div><div class="collapse-content">`;
                 subject.b.forEach(batch => {
