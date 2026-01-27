@@ -2,103 +2,109 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>thephysicsportal | custom player</title>
+    <title>thephysicsportal | Early Facebook Edition</title>
     <style>
-        body { background-color: #f7f7f7; font-family: "lucida grande", tahoma, verdana, arial, sans-serif; margin: 0; font-size: 11px; }
-        .header { background-color: #3b5998; padding: 8px 15px; color: white; border-bottom: 1px solid #29487d; font-weight: bold; font-size: 18px; }
+        body { background-color: #f7f7f7; color: #333; font-family: "lucida grande", tahoma, verdana, arial, sans-serif; margin: 0; padding: 0; font-size: 11px; }
+        .header { background-color: #3b5998; padding: 8px 15px; color: white; border-bottom: 1px solid #29487d; display: flex; align-items: flex-end; gap: 10px; }
+        .header h1 { font-size: 18px; margin: 0; letter-spacing: -1px; font-weight: bold; }
         .container { display: flex; max-width: 950px; margin: 20px auto; gap: 15px; }
         
         /* Sidebar */
         .sidebar { width: 150px; flex-shrink: 0; }
-        .side-box { background: white; border: 1px solid #d8dfea; padding: 5px; }
-        .nav-link { display: block; color: #3b5998; text-decoration: none; padding: 5px; cursor: pointer; border-bottom: 1px solid #eee; }
-        .nav-link:hover { background: #eceff5; }
+        .side-box { background: white; border: 1px solid #d8dfea; margin-bottom: 10px; padding: 5px; }
+        .side-header { background-color: #eceff5; padding: 3px 5px; color: #3b5998; font-weight: bold; margin-bottom: 5px; border-bottom: 1px solid #d8dfea; }
+        .nav-link { display: block; color: #3b5998; text-decoration: none; padding: 3px 5px; cursor: pointer; }
+        .nav-link:hover { background-color: #eceff5; text-decoration: underline; }
+        .nav-link.active { background-color: #3b5998; color: white; text-decoration: none; }
 
         /* Main Content */
         .main-content { flex-grow: 1; background: white; border: 1px solid #d8dfea; padding: 15px; }
-        
-        /* THE PLAYER ENGINE */
-        .player-wrapper { position: relative; width: 100%; aspect-ratio: 16/9; background: #000; overflow: hidden; }
-        #player { position: absolute; top: -50px; left: 0; width: 100%; height: calc(100% + 50px); }
-        
-        /* THE SHIELD (Blocks title and center clicks) */
-        .shield { position: absolute; top: 0; left: 0; width: 100%; height: 88%; z-index: 10; }
+        .content-header { border-bottom: 1px solid #d8dfea; padding-bottom: 5px; margin-bottom: 15px; color: #3b5998; font-size: 14px; font-weight: bold; }
 
-        /* CUSTOM BUTTON BAR */
-        .custom-bar { background: #f2f2f2; border: 1px solid #ccc; border-top: none; padding: 10px; display: flex; align-items: center; gap: 15px; }
-        .fb-btn { background: #3b5998; color: white; border: 1px solid #29487d; padding: 4px 10px; font-size: 11px; font-weight: bold; cursor: pointer; }
-        .fb-btn:hover { background: #4c70ba; }
-        select { font-size: 11px; padding: 2px; }
+        /* THE PLAYER ENGINE (Hidden URL) */
+        .video-engine { position: relative; width: 100%; aspect-ratio: 16/9; overflow: hidden; background: #000; border: 1px solid #3b5998; }
+        #player { position: absolute; top: -60px; left: 0; width: 100%; height: calc(100% + 120px); pointer-events: none; }
+
+        /* CUSTOM FACEBOOK BUTTON BAR */
+        .custom-controls { margin-top: 10px; background: #eceff5; border: 1px solid #d8dfea; padding: 10px; display: flex; align-items: center; gap: 15px; }
+        .fb-button { background: #3b5998; color: white; border: 1px solid #29487d; padding: 3px 10px; font-size: 11px; font-weight: bold; cursor: pointer; }
+        .fb-button:hover { background: #4c70ba; }
+        select { font-size: 11px; border: 1px solid #bdc7d8; }
     </style>
 </head>
 <body>
 
-<div class="header">thephysicsportal</div>
+    <div class="header"><h1>thephysicsportal</h1></div>
 
-<div class="container">
-    <div class="sidebar">
-        <div class="side-box">
-            <div style="font-weight:bold; color:#3b5998; margin-bottom:5px;">Lessons</div>
-            <div class="nav-link" onclick="loadVideo('6tLJsEfbVcY')">Test Lesson</div>
-            <div class="nav-link" onclick="loadVideo('GzY_iOnP3E8')">Lesson 1.1</div>
-        </div>
-    </div>
-
-    <div class="main-content">
-        <div class="player-wrapper">
-            <div id="player"></div>
-            <div class="shield" oncontextmenu="return false;"></div>
+    <div class="container">
+        <div class="sidebar">
+            <div class="side-box">
+                <div class="side-header">Physics Units</div>
+                <div class="nav-link active" onclick="loadNewVideo('6tLJsEfbVcY', this)">Test Lesson</div>
+                <div class="nav-link" onclick="loadNewVideo('GzY_iOnP3E8', this)">Lesson 1.1</div>
+            </div>
         </div>
 
-        <div class="custom-bar">
-            <button class="fb-btn" onclick="togglePlay()">PLAY / PAUSE</button>
+        <div class="main-content">
+            <div class="content-header" id="current-title">Test Lesson</div>
             
-            <div>
-                SPEED: 
-                <select id="speedSelect" onchange="changeSpeed(this.value)">
-                    <option value="1">1.0x</option>
-                    <option value="1.25">1.25x</option>
-                    <option value="1.5">1.5x</option>
-                    <option value="2">2.0x</option>
-                </select>
+            <div class="video-engine">
+                <div id="player"></div>
             </div>
 
-            <div style="color: #888; font-weight: normal; margin-left: auto;">
-                Use ⚙️ icon in video for Quality/Full-screen
+            <div class="custom-controls">
+                <button class="fb-button" onclick="playPause()">PLAY / PAUSE</button>
+                
+                <div>
+                    SPEED: 
+                    <select id="speed" onchange="setSpeed(this.value)">
+                        <option value="1">1.0x</option>
+                        <option value="1.25">1.25x</option>
+                        <option value="1.5">1.5x</option>
+                        <option value="2">2.0x</option>
+                    </select>
+                </div>
+
+                <div style="margin-left: auto;">
+                    <button class="fb-button" onclick="goFullscreen()">FULLSCREEN</button>
+                </div>
             </div>
+            
+            <p style="color: #777; margin-top: 15px;">Note: Resolution is auto-set to highest available based on your screen.</p>
         </div>
     </div>
-</div>
 
-<script src="https://www.youtube.com/iframe_api"></script>
-<script>
-    var player;
-    function onYouTubeIframeAPIReady() {
-        player = new YT.Player('player', {
-            videoId: '6tLJsEfbVcY',
-            playerVars: { 
-                'controls': 1, 
-                'modestbranding': 1, 
-                'rel': 0,
-                'disablekb': 0 
-            }
-        });
-    }
+    <script src="https://www.youtube.com/iframe_api"></script>
+    <script>
+        var player;
+        function onYouTubeIframeAPIReady() {
+            player = new YT.Player('player', {
+                videoId: '6tLJsEfbVcY',
+                playerVars: { 'controls': 0, 'modestbranding': 1, 'rel': 0, 'showinfo': 0 }
+            });
+        }
 
-    // HANDSHAKE FUNCTIONS
-    function togglePlay() {
-        var state = player.getPlayerState();
-        if (state == 1) { player.pauseVideo(); } else { player.playVideo(); }
-    }
+        // THE HANDSHAKE FUNCTIONS
+        function playPause() {
+            const state = player.getPlayerState();
+            if (state == 1) { player.pauseVideo(); } else { player.playVideo(); }
+        }
 
-    function changeSpeed(val) {
-        player.setPlaybackRate(parseFloat(val));
-    }
+        function setSpeed(val) {
+            player.setPlaybackRate(parseFloat(val));
+        }
 
-    function loadVideo(id) {
-        player.loadVideoById(id);
-    }
-</script>
+        function goFullscreen() {
+            const requestMethod = document.body.requestFullScreen || document.body.webkitRequestFullScreen || document.body.mozRequestFullScreen || document.body.msRequestFullScreen;
+            if (requestMethod) { requestMethod.call(document.body); }
+        }
 
+        function loadNewVideo(id, el) {
+            player.loadVideoById(id);
+            document.getElementById('current-title').innerText = el.innerText;
+            document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+            el.classList.add('active');
+        }
+    </script>
 </body>
 </html>
