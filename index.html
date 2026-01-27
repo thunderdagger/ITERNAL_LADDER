@@ -2,69 +2,54 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>thephysicsportal v3.1.2</title>
-    <script src="library.js"></script>
+    <title>thephysicsportal v3.1.6</title>
     <style>
+        /* FB THEME & LAYOUT */
         body { background-color: #f7f7f7; color: #333; font-family: "lucida grande", tahoma, verdana, arial, sans-serif; margin: 0; padding: 0; font-size: 11px; overflow-x: hidden; }
         .header { background-color: #3b5998; padding: 8px 15px; color: white; border-bottom: 1px solid #29487d; display: flex; align-items: flex-end; justify-content: space-between; }
         .header h1 { font-size: 18px; margin: 0; letter-spacing: -1px; font-weight: bold; }
         .container { display: flex; max-width: 1100px; margin: 20px auto; gap: 15px; }
         
-        /* SIDEBAR PROTECTION */
-        .sidebar { width: 220px; flex-shrink: 0; max-height: 85vh; overflow-y: auto; user-select: none; -webkit-user-select: none; }
-        .side-box { background: white; border: 1px solid #d8dfea; margin-bottom: 10px; padding: 0; }
-        .subject-header { background-color: #eceff5; padding: 6px 10px; color: #3b5998; font-weight: bold; border-bottom: 1px solid #d8dfea; font-size: 12px; }
+        /* SIDEBAR TREE STRUCTURE */
+        .sidebar { width: 230px; flex-shrink: 0; max-height: 85vh; overflow-y: auto; user-select: none; }
+        .side-box { background: white; border: 1px solid #d8dfea; margin-bottom: 10px; }
+        .subject-header { background: #eceff5; padding: 8px 10px; color: #3b5998; font-weight: bold; border-bottom: 1px solid #d8dfea; font-size: 12px; }
         .batch-group { padding: 5px 0 5px 10px; border-bottom: 1px solid #f0f0f0; }
-        .batch-title { font-weight: bold; color: #666; padding: 2px 5px; text-transform: uppercase; font-size: 10px; }
-        .unit-group { padding-left: 10px; margin-top: 3px; }
-        .unit-title { color: #3b5998; font-style: italic; margin-bottom: 2px; }
-        .nav-link { display: block; color: #3b5998; text-decoration: none; padding: 3px 5px 3px 15px; cursor: pointer; border-left: 2px solid transparent; }
+        .batch-title { font-weight: bold; color: #666; font-size: 10px; text-transform: uppercase; }
+        .unit-group { padding-left: 10px; margin-top: 5px; }
+        .unit-title { color: #3b5998; font-style: italic; margin-bottom: 3px; font-weight: bold; }
+        .nav-link { display: block; color: #3b5998; text-decoration: none; padding: 4px 5px 4px 15px; cursor: pointer; border-left: 2px solid transparent; }
         .nav-link:hover { background-color: #eff2f7; text-decoration: underline; }
-        .nav-link.active { background-color: #3b5998; color: white; font-weight: bold; }
+        .nav-link.active { background-color: #3b5998; color: white; font-weight: bold; border-left: 2px solid #29487d; }
 
         /* PLAYER ENGINE */
         #master-player-wrapper { position: relative; background: #fff; flex-grow: 1; border: 1px solid #d8dfea; display: flex; flex-direction: column; outline: none; overflow: hidden; }
-        .video-title-bar { background: #eceff5; border-bottom: 1px solid #d8dfea; padding: 8px 12px; z-index: 100; transition: transform 0.4s ease, opacity 0.4s ease; }
+        .video-title-bar { background: #eceff5; border-bottom: 1px solid #d8dfea; padding: 10px 12px; z-index: 100; transition: 0.4s ease; }
         .video-title-bar h2 { margin: 0; font-size: 13px; color: #3b5998; font-weight: bold; }
-        .video-engine { position: relative; width: 100%; aspect-ratio: 16/9; overflow: hidden; background: #000; z-index: 1; }
+        .video-engine { position: relative; width: 100%; aspect-ratio: 16/9; background: #000; z-index: 1; }
         #player { position: absolute; top: -55px; left: 0; width: 100%; height: calc(100% + 110px); pointer-events: none; }
         .shield { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 50; }
-        .floating-ui { background: #eceff5; border-top: 1px solid #3b5998; padding: 10px; z-index: 100; transition: transform 0.4s ease, opacity 0.4s ease; }
-
-        /* FULLSCREEN AUTO-HIDE FIX */
-        #master-player-wrapper:fullscreen .video-title-bar, 
-        #master-player-wrapper:-webkit-full-screen .video-title-bar { position: absolute; top: 0; left: 0; right: 0; background: rgba(236, 239, 245, 0.9); }
         
-        #master-player-wrapper:fullscreen .floating-ui, 
-        #master-player-wrapper:-webkit-full-screen .floating-ui { position: absolute; bottom: 0; left: 0; right: 0; background: rgba(236, 239, 245, 0.9); }
-
+        /* CONTROLS & FULLSCREEN */
+        .floating-ui { background: #eceff5; border-top: 1px solid #3b5998; padding: 10px; z-index: 100; transition: 0.4s ease; }
+        #master-player-wrapper:fullscreen .video-title-bar { position: absolute; top: 0; width: 100%; background: rgba(236,239,245,0.9); }
+        #master-player-wrapper:fullscreen .floating-ui { position: absolute; bottom: 0; width: 100%; background: rgba(236,239,245,0.9); box-sizing: border-box; }
+        .hide-ui { cursor: none !important; }
         .hide-ui .video-title-bar { transform: translateY(-100%); opacity: 0; }
         .hide-ui .floating-ui { transform: translateY(100%); opacity: 0; }
-        .hide-ui { cursor: none !important; }
-
-        /* CONTROLS */
-        .timeline-wrapper { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
-        .timeline-container { flex-grow: 1; background: #ccc; height: 10px; cursor: pointer; border: 1px solid #999; position: relative; overflow: hidden; }
-        .buffer-bar { position: absolute; background: #bbb; height: 100%; width: 0%; z-index: 1; }
+        
+        .timeline-container { flex-grow: 1; background: #ccc; height: 10px; cursor: pointer; border: 1px solid #999; position: relative; overflow: hidden; margin-bottom: 8px; }
         .progress-bar { position: absolute; background: #3b5998; height: 100%; width: 0%; z-index: 2; }
-        #time-display { font-family: monospace; color: #333; font-size: 11px; min-width: 120px; text-align: right; }
-        .custom-controls { display: flex; align-items: center; gap: 12px; }
         .fb-button { background: #3b5998; color: white; border: 1px solid #29487d; padding: 4px 10px; font-size: 10px; font-weight: bold; cursor: pointer; }
-        .shortcut-hint { color: #888; font-size: 9px; margin-left: 10px; border-left: 1px solid #bdc7d8; padding-left: 10px; }
-        input[type=range] { -webkit-appearance: none; width: 60px; background: transparent; }
-        input[type=range]::-webkit-slider-runnable-track { width: 100%; height: 5px; background: #bdc7d8; border-radius: 3px; }
-        input[type=range]::-webkit-slider-thumb { height: 12px; width: 12px; border-radius: 6px; background: #3b5998; -webkit-appearance: none; margin-top: -3.5px; }
     </style>
 </head>
 <body oncontextmenu="return false;">
 
-    <div class="header">
-        <h1>thephysicsportal <span style="font-size: 10px; font-weight: normal; opacity: 0.7;">v3.1.2</span></h1>
-    </div>
+    <div class="header"><h1>thephysicsportal <span style="font-weight:normal; font-size:10px;">v3.1.6</span></h1></div>
 
     <div class="container">
-        <div class="sidebar" id="main-sidebar"></div>
-
+        <div class="sidebar" id="main-sidebar">Initializing system...</div>
+        
         <div id="master-player-wrapper" tabindex="0">
             <div class="video-title-bar"><h2 id="current-video-title">Select Lesson</h2></div>
             <div class="video-engine">
@@ -72,18 +57,10 @@
                 <div class="shield"></div>
             </div>
             <div class="floating-ui">
-                <div class="timeline-wrapper">
-                    <div class="timeline-container" onclick="seek(event)">
-                        <div class="buffer-bar" id="buffer"></div>
-                        <div class="progress-bar" id="progress"></div>
-                    </div>
-                    <div id="time-display">00:00:00 / 00:00:00</div>
-                </div>
-                <div class="custom-controls">
+                <div class="timeline-container" onclick="seek(event)"><div class="progress-bar" id="progress"></div></div>
+                <div style="display:flex; align-items:center; gap:12px;">
                     <button class="fb-button" onclick="playPause()">PLAY / PAUSE</button>
-                    <span>SPD: <select onchange="setSpeed(this.value)"><option value="1">1x</option><option value="1.5">1.5x</option><option value="2">2x</option></select></span>
-                    <span style="font-weight:bold; color:#3b5998; font-size:10px;">VOL: <input type="range" min="0" max="100" value="100" oninput="setVolume(this.value)"></span>
-                    <div class="shortcut-hint">SPACE: PLAY/PAUSE • ARROWS: SEEK • F: FULLSCREEN</div>
+                    <span id="time-display" style="font-family:monospace; font-size:11px;">00:00:00 / 00:00:00</span>
                     <button class="fb-button" onclick="goFullscreen()" style="margin-left:auto;">FULL SCREEN</button>
                 </div>
             </div>
@@ -92,21 +69,30 @@
 
     <script src="https://www.youtube.com/iframe_api"></script>
     <script>
-        var player, progressInterval, idleTimer;
+        var player, idleTimer, portalData;
         const wrapper = document.getElementById('master-player-wrapper');
+
+        // FETCH FROM HIDDEN BINARY FILE
+        fetch('system.bin')
+            .then(res => res.text())
+            .then(scrambled => {
+                const decoded = decodeURIComponent(escape(atob(scrambled)));
+                portalData = JSON.parse(decoded);
+                buildSidebar();
+            })
+            .catch(err => { document.getElementById('main-sidebar').innerText = "System Error."; });
 
         function buildSidebar() {
             const sb = document.getElementById('main-sidebar');
             let h = '';
-            videoLibrary.forEach(s => {
-                h += `<div class="side-box"><div class="subject-header">${s.subject}</div>`;
-                s.batches.forEach(b => {
-                    h += `<div class="batch-group"><div class="batch-title">${b.year}</div>`;
-                    b.units.forEach(u => {
-                        h += `<div class="unit-group"><div class="unit-title">${u.unitName}</div>`;
-                        u.videos.forEach(v => {
-                            // v.id is ALREADY base64 from the library script
-                            h += `<div class="nav-link" onclick="handleSwitch('${v.id}', this)">${v.title}</div>`;
+            portalData.forEach(subject => {
+                h += `<div class="side-box"><div class="subject-header">${subject.s}</div>`;
+                subject.b.forEach(batch => {
+                    h += `<div class="batch-group"><div class="batch-title">${batch.y}</div>`;
+                    batch.u.forEach(unit => {
+                        h += `<div class="unit-group"><div class="unit-title">${unit.n}</div>`;
+                        unit.v.forEach(video => {
+                            h += `<div class="nav-link" onclick="handleSwitch('${video.i}', this)">${video.t}</div>`;
                         });
                         h += `</div>`;
                     });
@@ -117,75 +103,38 @@
             sb.innerHTML = h;
         }
 
-        function handleSwitch(scrambled, el) { loadNewVideo(atob(scrambled), el); }
-
-        function onYouTubeIframeAPIReady() {
-            buildSidebar();
-            player = new YT.Player('player', {
-                videoId: atob(videoLibrary[0].batches[0].units[0].videos[0].id),
-                playerVars: { 'controls': 0, 'modestbranding': 1, 'rel': 0 },
-                events: { 'onStateChange': onPlayerStateChange, 'onReady': () => { updateTitle(); wrapper.focus(); } }
-            });
-        }
-
-        function onPlayerStateChange(e) {
-            if (e.data == 1) { 
-                progressInterval = setInterval(updateUI, 500); 
-                startIdleTimer();
-            } else { 
-                clearInterval(progressInterval); 
-                showUI(); 
-            }
-            updateTitle();
-        }
-
-        function startIdleTimer() {
-            showUI();
-            clearTimeout(idleTimer);
-            if (document.fullscreenElement && player.getPlayerState() === 1) {
-                idleTimer = setTimeout(hideUI, 3000);
-            }
-        }
-
-        function hideUI() { wrapper.classList.add('hide-ui'); }
-        function showUI() { wrapper.classList.remove('hide-ui'); }
-
-        wrapper.addEventListener('mousemove', startIdleTimer);
-        wrapper.addEventListener('keydown', (e) => {
-            if (e.code === "Space") { e.preventDefault(); playPause(); }
-            if (e.code === "ArrowRight") player.seekTo(player.getCurrentTime() + 5, true);
-            if (e.code === "ArrowLeft") player.seekTo(player.getCurrentTime() - 5, true);
-            if (e.code === "KeyF") goFullscreen();
-            startIdleTimer();
-        });
-
-        function updateUI() {
-            var curr = player.getCurrentTime(), dur = player.getDuration(), buff = player.getVideoLoadedFraction();
-            if (dur > 0) {
-                document.getElementById('progress').style.width = (curr/dur*100) + "%";
-                document.getElementById('buffer').style.width = (buff*100) + "%";
-                document.getElementById('time-display').innerText = formatTime(curr) + " / " + formatTime(dur);
-            }
-        }
-        function formatTime(t) {
-            var h = Math.floor(t/3600), m = Math.floor((t%3600)/60), s = Math.floor(t%60);
-            return (h<10?'0'+h:h)+":"+(m<10?'0'+m:m)+":"+(s<10?'0'+s:s);
-        }
-        function updateTitle() { try { document.getElementById('current-video-title').innerText = player.getVideoData().title; } catch(e){} }
-        function playPause() { (player.getPlayerState()==1)?player.pauseVideo():player.playVideo(); }
-        function setSpeed(v) { player.setPlaybackRate(parseFloat(v)); }
-        function setVolume(v) { player.setVolume(v); }
-        function seek(e) { var r = e.currentTarget.getBoundingClientRect(); player.seekTo(player.getDuration()*((e.clientX-r.left)/r.width), true); }
-        function goFullscreen() { 
-            if(!document.fullscreenElement) wrapper.requestFullscreen().catch(e=>console.log(e));
-            else document.exitFullscreen();
-        }
-        function loadNewVideo(id, el) {
+        function handleSwitch(id, el) { 
             player.loadVideoById(id);
             document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
             el.classList.add('active');
             wrapper.focus();
         }
+
+        function onYouTubeIframeAPIReady() {
+            const waiter = setInterval(() => {
+                if(portalData) {
+                    clearInterval(waiter);
+                    player = new YT.Player('player', {
+                        videoId: portalData[0].b[0].u[0].v[0].i,
+                        playerVars: { 'controls': 0, 'modestbranding': 1, 'rel': 0 },
+                        events: { 'onStateChange': onStateChange, 'onReady': updateTitle }
+                    });
+                }
+            }, 100);
+            setInterval(updateUI, 500);
+        }
+
+        function onStateChange(e) { if(e.data == 1) startIdleTimer(); else showUI(); updateTitle(); }
+        function updateUI() { if(player && player.getDuration) { var c = player.getCurrentTime(), d = player.getDuration(); document.getElementById('progress').style.width = (c/d*100) + "%"; document.getElementById('time-display').innerText = formatTime(c) + " / " + formatTime(d); } }
+        function formatTime(t) { var h=Math.floor(t/3600), m=Math.floor((t%3600)/60), s=Math.floor(t%60); return (h<10?'0'+h:h)+":"+(m<10?'0'+m:m)+":"+(s<10?'0'+s:s); }
+        function updateTitle() { try { document.getElementById('current-video-title').innerText = player.getVideoData().title; } catch(e){} }
+        function playPause() { (player.getPlayerState()==1)?player.pauseVideo():player.playVideo(); }
+        function goFullscreen() { if(!document.fullscreenElement) wrapper.requestFullscreen(); else document.exitFullscreen(); }
+        function seek(e) { var r = e.currentTarget.getBoundingClientRect(); player.seekTo(player.getDuration()*((e.clientX-r.left)/r.width), true); }
+        function startIdleTimer() { showUI(); clearTimeout(idleTimer); if (document.fullscreenElement) idleTimer = setTimeout(() => wrapper.classList.add('hide-ui'), 3000); }
+        function showUI() { wrapper.classList.remove('hide-ui'); }
+        wrapper.addEventListener('mousemove', startIdleTimer);
+        wrapper.addEventListener('keydown', (e) => { if(e.code==="Space"){e.preventDefault(); playPause();} if(e.code==="KeyF") goFullscreen(); startIdleTimer(); });
     </script>
 </body>
 </html>
