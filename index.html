@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>thephysicsportal v2.2.1</title>
+    <title>thephysicsportal v2.3.0</title>
     <style>
         body { background-color: #f7f7f7; color: #333; font-family: "lucida grande", tahoma, verdana, arial, sans-serif; margin: 0; padding: 0; font-size: 11px; }
         .header { background-color: #3b5998; padding: 8px 15px; color: white; border-bottom: 1px solid #29487d; display: flex; align-items: flex-end; justify-content: space-between; }
@@ -15,15 +15,9 @@
         .nav-link { display: block; color: #3b5998; text-decoration: none; padding: 3px 5px; cursor: pointer; }
         .nav-link.active { background-color: #3b5998; color: white; }
 
-        #master-player-wrapper { position: relative; background: #fff; flex-grow: 1; border: 1px solid #d8dfea; display: flex; flex-direction: column; }
+        #master-player-wrapper { position: relative; background: #fff; flex-grow: 1; border: 1px solid #d8dfea; display: flex; flex-direction: column; outline: none; }
         
-        .video-title-bar { 
-            background: #eceff5; 
-            border-bottom: 1px solid #d8dfea; 
-            padding: 8px 12px; 
-            z-index: 11;
-            transition: transform 0.4s ease, opacity 0.4s ease;
-        }
+        .video-title-bar { background: #eceff5; border-bottom: 1px solid #d8dfea; padding: 8px 12px; z-index: 11; transition: transform 0.4s ease, opacity 0.4s ease; }
         .video-title-bar h2 { margin: 0; font-size: 13px; color: #3b5998; font-weight: bold; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
         .video-engine { position: relative; width: 100%; aspect-ratio: 16/9; overflow: hidden; background: #000; z-index: 1; }
@@ -32,17 +26,20 @@
 
         .floating-ui { background: #eceff5; border-top: 1px solid #3b5998; padding: 10px; z-index: 10; transition: transform 0.4s ease, opacity 0.4s ease; }
 
+        /* FULLSCREEN */
         #master-player-wrapper:fullscreen { background: #000; border: none; width: 100vw; height: 100vh; justify-content: center; }
         #master-player-wrapper:fullscreen .video-title-bar { position: absolute; top: 0; left: 0; right: 0; background: rgba(236, 239, 245, 0.92); border-bottom: 1px solid #3b5998; }
         #master-player-wrapper:fullscreen .floating-ui { position: absolute; bottom: 0; left: 0; right: 0; background: rgba(236, 239, 245, 0.92); }
-        
         #master-player-wrapper:fullscreen.hide-ui { cursor: none; }
         #master-player-wrapper:fullscreen.hide-ui .floating-ui { transform: translateY(100%); opacity: 0; }
         #master-player-wrapper:fullscreen.hide-ui .video-title-bar { transform: translateY(-100%); opacity: 0; }
 
+        /* TIMELINE WITH BUFFER */
         .timeline-wrapper { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
-        .timeline-container { flex-grow: 1; background: #ddd; height: 10px; cursor: pointer; border: 1px solid #999; position: relative; }
-        .progress-bar { background: #3b5998; height: 100%; width: 0%; transition: width 0.1s linear; }
+        .timeline-container { flex-grow: 1; background: #ccc; height: 10px; cursor: pointer; border: 1px solid #999; position: relative; overflow: hidden; }
+        .buffer-bar { position: absolute; background: #bbb; height: 100%; width: 0%; z-index: 1; transition: width 0.3s ease; }
+        .progress-bar { position: absolute; background: #3b5998; height: 100%; width: 0%; z-index: 2; transition: width 0.1s linear; }
+        
         #time-display { font-family: monospace; color: #333; font-size: 11px; min-width: 120px; text-align: right; }
 
         .custom-controls { display: flex; align-items: center; gap: 15px; }
@@ -56,7 +53,7 @@
 <body>
 
     <div class="header">
-        <h1>thephysicsportal <span style="font-size: 12px; font-weight: normal; opacity: 0.8;">v2.2.1</span></h1>
+        <h1>thephysicsportal <span style="font-size: 12px; font-weight: normal; opacity: 0.8;">v2.3.0</span></h1>
         <div style="font-size: 11px;">home | search | browse</div>
     </div>
 
@@ -67,9 +64,15 @@
                 <div class="nav-link active" onclick="loadNewVideo('6tLJsEfbVcY', this)">Test Lesson</div>
                 <div class="nav-link" onclick="loadNewVideo('GzY_iOnP3E8', this)">Lesson 1.1</div>
             </div>
+            <div style="font-size: 9px; color: #999; padding: 5px;">
+                Shortcuts:<br>
+                Space: Play/Pause<br>
+                Arrows: Seek<br>
+                F: Fullscreen
+            </div>
         </div>
 
-        <div id="master-player-wrapper">
+        <div id="master-player-wrapper" tabindex="0">
             <div class="video-title-bar">
                 <h2 id="current-video-title">Loading title...</h2>
             </div>
@@ -82,6 +85,7 @@
             <div class="floating-ui" id="controls-bar">
                 <div class="timeline-wrapper">
                     <div class="timeline-container" id="timeline" onclick="seek(event)">
+                        <div class="buffer-bar" id="buffer"></div>
                         <div class="progress-bar" id="progress"></div>
                     </div>
                     <div id="time-display">00:00:00 / 00:00:00</div>
@@ -116,9 +120,15 @@
                 playerVars: { 'controls': 1, 'modestbranding': 1, 'rel': 0, 'vq': 'small' },
                 events: { 
                     'onStateChange': onPlayerStateChange,
-                    'onReady': updateAutoTitle 
+                    'onReady': onPlayerReady 
                 }
             });
+        }
+
+        function onPlayerReady() {
+            updateAutoTitle();
+            // Automatically focus the player so shortcuts work immediately
+            wrapper.focus();
         }
 
         function updateAutoTitle() {
@@ -127,10 +137,16 @@
                 if (videoData && videoData.title) {
                     document.getElementById('current-video-title').innerText = videoData.title;
                 }
-            } catch (e) {
-                console.log("Title not ready yet...");
-            }
+            } catch (e) {}
         }
+
+        // --- KEYBOARD SHORTCUTS ---
+        wrapper.addEventListener('keydown', function(e) {
+            if (e.code === "Space") { e.preventDefault(); playPause(); }
+            if (e.code === "ArrowRight") { player.seekTo(player.getCurrentTime() + 5, true); }
+            if (e.code === "ArrowLeft") { player.seekTo(player.getCurrentTime() - 5, true); }
+            if (e.code === "KeyF") { goFullscreen(); }
+        });
 
         function resetIdleTimer() {
             const isFullscreen = document.fullscreenElement || document.webkitFullscreenElement;
@@ -142,14 +158,9 @@
         }
 
         wrapper.addEventListener('mousemove', resetIdleTimer);
-        wrapper.addEventListener('click', resetIdleTimer);
 
         function onPlayerStateChange(event) {
-            // When video starts playing (1) or changes, grab the title
-            if (event.data == 1 || event.data == -1) {
-                updateAutoTitle();
-            }
-            
+            if (event.data == 1 || event.data == -1) { updateAutoTitle(); }
             if (event.data == 1) {
                 progressInterval = setInterval(updateUI, 500);
                 resetIdleTimer();
@@ -170,8 +181,10 @@
         function updateUI() {
             var curr = player.getCurrentTime();
             var dur = player.getDuration();
+            var buffered = player.getVideoLoadedFraction();
             if (dur > 0) {
                 document.getElementById('progress').style.width = (curr / dur * 100) + "%";
+                document.getElementById('buffer').style.width = (buffered * 100) + "%";
                 document.getElementById('time-display').innerText = formatTime(curr) + " / " + formatTime(dur);
             }
         }
@@ -187,16 +200,20 @@
 
         function goFullscreen() {
             var el = document.getElementById('master-player-wrapper');
-            if (el.requestFullscreen) { el.requestFullscreen(); }
-            else if (el.webkitRequestFullscreen) { el.webkitRequestFullscreen(); }
+            if (!document.fullscreenElement) {
+                if (el.requestFullscreen) { el.requestFullscreen(); }
+                else if (el.webkitRequestFullscreen) { el.webkitRequestFullscreen(); }
+            } else {
+                document.exitFullscreen();
+            }
         }
 
         function loadNewVideo(id, el) {
             player.loadVideoById(id);
-            // Reset title to loading until API responds
             document.getElementById('current-video-title').innerText = "Loading title...";
             document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
             el.classList.add('active');
+            wrapper.focus(); // Keep focus for shortcuts
         }
     </script>
 </body>
