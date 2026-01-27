@@ -2,42 +2,36 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>thephysicsportal v1.0</title>
+    <title>thephysicsportal v1.1</title>
     <style>
         body { background-color: #f7f7f7; color: #333; font-family: "lucida grande", tahoma, verdana, arial, sans-serif; margin: 0; padding: 0; font-size: 11px; }
-        
-        /* Header with Version Number */
         .header { background-color: #3b5998; padding: 8px 15px; color: white; border-bottom: 1px solid #29487d; display: flex; align-items: flex-end; justify-content: space-between; }
         .header h1 { font-size: 18px; margin: 0; letter-spacing: -1px; font-weight: bold; }
-
         .container { display: flex; max-width: 950px; margin: 20px auto; gap: 15px; }
-        
-        /* Sidebar */
         .sidebar { width: 150px; flex-shrink: 0; }
         .side-box { background: white; border: 1px solid #d8dfea; margin-bottom: 10px; padding: 5px; }
         .side-header { background-color: #eceff5; padding: 3px 5px; color: #3b5998; font-weight: bold; margin-bottom: 5px; border-bottom: 1px solid #d8dfea; }
         .nav-link { display: block; color: #3b5998; text-decoration: none; padding: 3px 5px; cursor: pointer; }
         .nav-link.active { background-color: #3b5998; color: white; }
-
-        /* Main Player Area */
         .main-content { flex-grow: 1; background: white; border: 1px solid #d8dfea; padding: 15px; }
-        .video-engine { position: relative; width: 100%; aspect-ratio: 16/9; overflow: hidden; background: #000; border: 1px solid #3b5998; }
-        #player { position: absolute; top: -60px; left: 0; width: 100%; height: calc(100% + 120px); pointer-events: none; }
 
-        /* CUSTOM TIMELINE BAR */
-        .timeline-container { background: #eee; height: 10px; width: 100%; cursor: pointer; margin-top: 10px; border: 1px solid #ccc; position: relative; }
+        /* 360p Optimized Container */
+        .video-engine { position: relative; width: 100%; max-width: 640px; aspect-ratio: 16/9; overflow: hidden; background: #000; border: 1px solid #3b5998; margin: 0 auto; }
+        #player { position: absolute; top: -55px; left: 0; width: 100%; height: calc(100% + 110px); pointer-events: none; }
+        .shield { position: absolute; top: 0; left: 0; width: 100%; height: 80%; z-index: 100; }
+
+        .timeline-container { background: #eee; height: 10px; width: 100%; max-width: 640px; cursor: pointer; margin: 10px auto 0; border: 1px solid #ccc; position: relative; }
         .progress-bar { background: #3b5998; height: 100%; width: 0%; transition: width 0.1s linear; }
 
-        /* CUSTOM BUTTON BAR */
-        .custom-controls { margin-top: 5px; background: #eceff5; border: 1px solid #d8dfea; padding: 10px; display: flex; align-items: center; gap: 15px; }
-        .fb-button { background: #3b5998; color: white; border: 1px solid #29487d; padding: 3px 10px; font-size: 11px; font-weight: bold; cursor: pointer; }
-        select { font-size: 11px; border: 1px solid #bdc7d8; }
+        .custom-controls { margin: 5px auto 0; max-width: 640px; background: #eceff5; border: 1px solid #d8dfea; padding: 10px; display: flex; align-items: center; gap: 12px; }
+        .fb-button { background: #3b5998; color: white; border: 1px solid #29487d; padding: 3px 8px; font-size: 10px; font-weight: bold; cursor: pointer; white-space: nowrap; }
+        select, input { font-size: 10px; border: 1px solid #bdc7d8; vertical-align: middle; }
     </style>
 </head>
 <body>
 
     <div class="header">
-        <h1>thephysicsportal v1.0</h1>
+        <h1>thephysicsportal <span style="font-size: 12px; font-weight: normal; opacity: 0.8;">v1.1</span></h1>
         <div style="font-size: 11px;">home | search | browse</div>
     </div>
 
@@ -53,6 +47,7 @@
         <div class="main-content">
             <div class="video-engine">
                 <div id="player"></div>
+                <div class="shield" oncontextmenu="return false;"></div>
             </div>
 
             <div class="timeline-container" id="timeline" onclick="seek(event)">
@@ -62,19 +57,17 @@
             <div class="custom-controls">
                 <button class="fb-button" onclick="playPause()">PLAY / PAUSE</button>
                 
-                <div>
-                    SPEED: 
-                    <select id="speed" onchange="setSpeed(this.value)">
-                        <option value="1">1.0x</option>
-                        <option value="1.25">1.25x</option>
+                <span>SPD: 
+                    <select onchange="setSpeed(this.value)">
+                        <option value="1">1x</option>
                         <option value="1.5">1.5x</option>
-                        <option value="2">2.0x</option>
+                        <option value="2">2x</option>
                     </select>
-                </div>
+                </span>
 
-                <div style="margin-left: auto;">
-                    <button class="fb-button" onclick="goFullscreen()">FULLSCREEN</button>
-                </div>
+                <span>VOL: <input type="range" min="0" max="100" value="100" oninput="setVolume(this.value)" style="width:60px;"></span>
+
+                <button class="fb-button" onclick="goFullscreen()" style="margin-left:auto;">FULLSCREEN</button>
             </div>
         </div>
     </div>
@@ -82,54 +75,34 @@
     <script src="https://www.youtube.com/iframe_api"></script>
     <script>
         var player;
-        var progressInterval;
-
         function onYouTubeIframeAPIReady() {
             player = new YT.Player('player', {
                 videoId: '6tLJsEfbVcY',
-                playerVars: { 'controls': 0, 'modestbranding': 1, 'rel': 0, 'showinfo': 0 },
+                playerVars: { 'controls': 1, 'modestbranding': 1, 'rel': 0, 'vq': 'small' },
                 events: { 'onStateChange': onPlayerStateChange }
             });
         }
 
         function onPlayerStateChange(event) {
-            if (event.data == YT.PlayerState.PLAYING) {
-                progressInterval = setInterval(updateProgress, 500);
-            } else {
-                clearInterval(progressInterval);
-            }
+            if (event.data == 1) setInterval(updateProgress, 500);
         }
 
         function updateProgress() {
-            var curr = player.getCurrentTime();
-            var dur = player.getDuration();
-            if (dur > 0) {
-                var perc = (curr / dur) * 100;
-                document.getElementById('progress').style.width = perc + "%";
-            }
+            var perc = (player.getCurrentTime() / player.getDuration()) * 100;
+            document.getElementById('progress').style.width = perc + "%";
         }
 
-        function seek(event) {
-            var timeline = document.getElementById('timeline');
-            var rect = timeline.getBoundingClientRect();
-            var x = event.clientX - rect.left;
-            var width = rect.right - rect.left;
-            var percentage = x / width;
-            var newTime = player.getDuration() * percentage;
-            player.seekTo(newTime, true);
+        function seek(e) {
+            var rect = document.getElementById('timeline').getBoundingClientRect();
+            player.seekTo(player.getDuration() * ((e.clientX - rect.left) / rect.width), true);
         }
 
-        function playPause() {
-            const state = player.getPlayerState();
-            if (state == 1) { player.pauseVideo(); } else { player.playVideo(); }
-        }
-
-        function setSpeed(val) { player.setPlaybackRate(parseFloat(val)); }
-
+        function playPause() { (player.getPlayerState() == 1) ? player.pauseVideo() : player.playVideo(); }
+        function setSpeed(v) { player.setPlaybackRate(parseFloat(v)); }
+        function setVolume(v) { player.setVolume(v); }
         function goFullscreen() {
-            const el = document.querySelector('.video-engine');
-            if (el.requestFullscreen) el.requestFullscreen();
-            else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen();
+            var el = document.querySelector('.video-engine');
+            if (el.requestFullscreen) el.requestFullscreen(); else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen();
         }
 
         function loadNewVideo(id, el) {
