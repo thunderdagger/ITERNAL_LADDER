@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>thephysicsportal v2.2.0</title>
+    <title>thephysicsportal v2.2.1</title>
     <style>
         body { background-color: #f7f7f7; color: #333; font-family: "lucida grande", tahoma, verdana, arial, sans-serif; margin: 0; padding: 0; font-size: 11px; }
         .header { background-color: #3b5998; padding: 8px 15px; color: white; border-bottom: 1px solid #29487d; display: flex; align-items: flex-end; justify-content: space-between; }
@@ -15,10 +15,8 @@
         .nav-link { display: block; color: #3b5998; text-decoration: none; padding: 3px 5px; cursor: pointer; }
         .nav-link.active { background-color: #3b5998; color: white; }
 
-        /* MASTER WRAPPER */
         #master-player-wrapper { position: relative; background: #fff; flex-grow: 1; border: 1px solid #d8dfea; display: flex; flex-direction: column; }
         
-        /* EARLY FB VIDEO TITLE BAR */
         .video-title-bar { 
             background: #eceff5; 
             border-bottom: 1px solid #d8dfea; 
@@ -26,7 +24,7 @@
             z-index: 11;
             transition: transform 0.4s ease, opacity 0.4s ease;
         }
-        .video-title-bar h2 { margin: 0; font-size: 13px; color: #3b5998; font-weight: bold; }
+        .video-title-bar h2 { margin: 0; font-size: 13px; color: #3b5998; font-weight: bold; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
         .video-engine { position: relative; width: 100%; aspect-ratio: 16/9; overflow: hidden; background: #000; z-index: 1; }
         #player { position: absolute; top: -55px; left: 0; width: 100%; height: calc(100% + 110px); pointer-events: none; }
@@ -34,19 +32,14 @@
 
         .floating-ui { background: #eceff5; border-top: 1px solid #3b5998; padding: 10px; z-index: 10; transition: transform 0.4s ease, opacity 0.4s ease; }
 
-        /* FULLSCREEN LOGIC */
         #master-player-wrapper:fullscreen { background: #000; border: none; width: 100vw; height: 100vh; justify-content: center; }
-        #master-player-wrapper:fullscreen .video-title-bar { 
-            position: absolute; top: 0; left: 0; right: 0; background: rgba(236, 239, 245, 0.92); border-bottom: 1px solid #3b5998;
-        }
+        #master-player-wrapper:fullscreen .video-title-bar { position: absolute; top: 0; left: 0; right: 0; background: rgba(236, 239, 245, 0.92); border-bottom: 1px solid #3b5998; }
         #master-player-wrapper:fullscreen .floating-ui { position: absolute; bottom: 0; left: 0; right: 0; background: rgba(236, 239, 245, 0.92); }
         
-        /* AUTO-HIDE IN FULLSCREEN */
         #master-player-wrapper:fullscreen.hide-ui { cursor: none; }
         #master-player-wrapper:fullscreen.hide-ui .floating-ui { transform: translateY(100%); opacity: 0; }
         #master-player-wrapper:fullscreen.hide-ui .video-title-bar { transform: translateY(-100%); opacity: 0; }
 
-        /* UI ELEMENTS */
         .timeline-wrapper { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
         .timeline-container { flex-grow: 1; background: #ddd; height: 10px; cursor: pointer; border: 1px solid #999; position: relative; }
         .progress-bar { background: #3b5998; height: 100%; width: 0%; transition: width 0.1s linear; }
@@ -58,13 +51,12 @@
         input[type=range] { -webkit-appearance: none; width: 70px; background: transparent; }
         input[type=range]::-webkit-slider-runnable-track { width: 100%; height: 6px; cursor: pointer; background: #bdc7d8; border-radius: 3px; }
         input[type=range]::-webkit-slider-thumb { height: 14px; width: 14px; border-radius: 7px; background: #3b5998; cursor: pointer; -webkit-appearance: none; margin-top: -4px; }
-        select { font-size: 11px; border: 1px solid #bdc7d8; padding: 2px; }
     </style>
 </head>
 <body>
 
     <div class="header">
-        <h1>thephysicsportal <span style="font-size: 12px; font-weight: normal; opacity: 0.8;">v2.2.0</span></h1>
+        <h1>thephysicsportal <span style="font-size: 12px; font-weight: normal; opacity: 0.8;">v2.2.1</span></h1>
         <div style="font-size: 11px;">home | search | browse</div>
     </div>
 
@@ -72,14 +64,14 @@
         <div class="sidebar">
             <div class="side-box">
                 <div class="side-header">Physics Units</div>
-                <div class="nav-link active" onclick="loadNewVideo('6tLJsEfbVcY', 'Test Lesson', this)">Test Lesson</div>
-                <div class="nav-link" onclick="loadNewVideo('GzY_iOnP3E8', 'Lesson 1.1: Kinematics', this)">Lesson 1.1</div>
+                <div class="nav-link active" onclick="loadNewVideo('6tLJsEfbVcY', this)">Test Lesson</div>
+                <div class="nav-link" onclick="loadNewVideo('GzY_iOnP3E8', this)">Lesson 1.1</div>
             </div>
         </div>
 
         <div id="master-player-wrapper">
             <div class="video-title-bar">
-                <h2 id="current-video-title">Test Lesson</h2>
+                <h2 id="current-video-title">Loading title...</h2>
             </div>
 
             <div class="video-engine">
@@ -122,8 +114,22 @@
             player = new YT.Player('player', {
                 videoId: '6tLJsEfbVcY',
                 playerVars: { 'controls': 1, 'modestbranding': 1, 'rel': 0, 'vq': 'small' },
-                events: { 'onStateChange': onPlayerStateChange }
+                events: { 
+                    'onStateChange': onPlayerStateChange,
+                    'onReady': updateAutoTitle 
+                }
             });
+        }
+
+        function updateAutoTitle() {
+            try {
+                var videoData = player.getVideoData();
+                if (videoData && videoData.title) {
+                    document.getElementById('current-video-title').innerText = videoData.title;
+                }
+            } catch (e) {
+                console.log("Title not ready yet...");
+            }
         }
 
         function resetIdleTimer() {
@@ -139,6 +145,11 @@
         wrapper.addEventListener('click', resetIdleTimer);
 
         function onPlayerStateChange(event) {
+            // When video starts playing (1) or changes, grab the title
+            if (event.data == 1 || event.data == -1) {
+                updateAutoTitle();
+            }
+            
             if (event.data == 1) {
                 progressInterval = setInterval(updateUI, 500);
                 resetIdleTimer();
@@ -180,9 +191,10 @@
             else if (el.webkitRequestFullscreen) { el.webkitRequestFullscreen(); }
         }
 
-        function loadNewVideo(id, title, el) {
+        function loadNewVideo(id, el) {
             player.loadVideoById(id);
-            document.getElementById('current-video-title').innerText = title;
+            // Reset title to loading until API responds
+            document.getElementById('current-video-title').innerText = "Loading title...";
             document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
             el.classList.add('active');
         }
