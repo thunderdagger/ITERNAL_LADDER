@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>theeternalladder v3.2.1</title>
+    <title>theeternalladder v3.2.2</title>
     <style>
         /* BASE THEME */
         body { background-color: #f7f7f7; color: #333; font-family: "lucida grande", tahoma, verdana, arial, sans-serif; margin: 0; padding: 0; font-size: 11px; overflow-x: hidden; }
@@ -58,7 +58,7 @@
 </head>
 <body oncontextmenu="return false;">
 
-    <div class="header"><h1>theeternalladder <span style="font-weight:normal; font-size:10px;">v3.2.1</span></h1></div>
+    <div class="header"><h1>theeternalladder <span style="font-weight:normal; font-size:10px;">v3.2.2</span></h1></div>
 
     <div class="container">
         <div class="sidebar" id="main-sidebar">Fetching system data...</div>
@@ -138,7 +138,6 @@
         function handleSwitch(id, el) { 
             document.getElementById('landing-overlay').classList.add('hidden');
             player.loadVideoById(id);
-            document.getElementById('current-video-title').innerText = el.innerText;
             document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
             el.classList.add('active');
             wrapper.focus();
@@ -156,6 +155,7 @@
                             'onStateChange': (e) => { 
                                 if(e.data == 1) { startIdleTimer(); player.setPlaybackRate(parseFloat(currentSpeed)); } 
                                 else { showUI(); }
+                                updateTitle(); 
                             }
                         }
                     });
@@ -174,6 +174,7 @@
             } 
         }
         function formatTime(t) { var h=Math.floor(t/3600), m=Math.floor((t%3600)/60), s=Math.floor(t%60); return (h<10?'0'+h:h)+":"+(m<10?'0'+m:m)+":"+(s<10?'0'+s:s); }
+        function updateTitle() { try { document.getElementById('current-video-title').innerText = player.getVideoData().title; } catch(e){} }
         function playPause() { (player.getPlayerState()==1)?player.pauseVideo():player.playVideo(); }
         function goFullscreen() { if(!document.fullscreenElement) wrapper.requestFullscreen(); else document.exitFullscreen(); }
         function seek(e) { var r = e.currentTarget.getBoundingClientRect(); player.seekTo(player.getDuration()*((e.clientX-r.left)/r.width), true); }
