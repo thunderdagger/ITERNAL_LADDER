@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>thephysicsportal v3.1.6</title>
+    <title>thephysicsportal v3.1.7</title>
     <style>
         /* FB THEME & LAYOUT */
         body { background-color: #f7f7f7; color: #333; font-family: "lucida grande", tahoma, verdana, arial, sans-serif; margin: 0; padding: 0; font-size: 11px; overflow-x: hidden; }
@@ -10,7 +10,7 @@
         .header h1 { font-size: 18px; margin: 0; letter-spacing: -1px; font-weight: bold; }
         .container { display: flex; max-width: 1100px; margin: 20px auto; gap: 15px; }
         
-        /* SIDEBAR TREE STRUCTURE */
+        /* SIDEBAR */
         .sidebar { width: 230px; flex-shrink: 0; max-height: 85vh; overflow-y: auto; user-select: none; }
         .side-box { background: white; border: 1px solid #d8dfea; margin-bottom: 10px; }
         .subject-header { background: #eceff5; padding: 8px 10px; color: #3b5998; font-weight: bold; border-bottom: 1px solid #d8dfea; font-size: 12px; }
@@ -30,7 +30,7 @@
         #player { position: absolute; top: -55px; left: 0; width: 100%; height: calc(100% + 110px); pointer-events: none; }
         .shield { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 50; }
         
-        /* CONTROLS & FULLSCREEN */
+        /* CONTROLS */
         .floating-ui { background: #eceff5; border-top: 1px solid #3b5998; padding: 10px; z-index: 100; transition: 0.4s ease; }
         #master-player-wrapper:fullscreen .video-title-bar { position: absolute; top: 0; width: 100%; background: rgba(236,239,245,0.9); }
         #master-player-wrapper:fullscreen .floating-ui { position: absolute; bottom: 0; width: 100%; background: rgba(236,239,245,0.9); box-sizing: border-box; }
@@ -41,11 +41,15 @@
         .timeline-container { flex-grow: 1; background: #ccc; height: 10px; cursor: pointer; border: 1px solid #999; position: relative; overflow: hidden; margin-bottom: 8px; }
         .progress-bar { position: absolute; background: #3b5998; height: 100%; width: 0%; z-index: 2; }
         .fb-button { background: #3b5998; color: white; border: 1px solid #29487d; padding: 4px 10px; font-size: 10px; font-weight: bold; cursor: pointer; }
+        
+        /* SPEED SELECTOR STYLE */
+        .speed-control { font-size: 10px; font-weight: bold; color: #3b5998; margin: 0 10px; }
+        .speed-select { font-size: 10px; border: 1px solid #bdc7d8; padding: 2px; background: #fff; cursor: pointer; }
     </style>
 </head>
 <body oncontextmenu="return false;">
 
-    <div class="header"><h1>thephysicsportal <span style="font-weight:normal; font-size:10px;">v3.1.6</span></h1></div>
+    <div class="header"><h1>thephysicsportal <span style="font-weight:normal; font-size:10px;">v3.1.7</span></h1></div>
 
     <div class="container">
         <div class="sidebar" id="main-sidebar">Initializing system...</div>
@@ -60,6 +64,18 @@
                 <div class="timeline-container" onclick="seek(event)"><div class="progress-bar" id="progress"></div></div>
                 <div style="display:flex; align-items:center; gap:12px;">
                     <button class="fb-button" onclick="playPause()">PLAY / PAUSE</button>
+                    
+                    <div class="speed-control">
+                        SPEED: 
+                        <select id="video-speed" class="speed-select" onchange="setSpeed(this.value)">
+                            <option value="1">1.0x</option>
+                            <option value="1.25">1.25x</option>
+                            <option value="1.5">1.5x</option>
+                            <option value="1.75">1.75x</option>
+                            <option value="2">2.0x</option>
+                        </select>
+                    </div>
+
                     <span id="time-display" style="font-family:monospace; font-size:11px;">00:00:00 / 00:00:00</span>
                     <button class="fb-button" onclick="goFullscreen()" style="margin-left:auto;">FULL SCREEN</button>
                 </div>
@@ -69,10 +85,9 @@
 
     <script src="https://www.youtube.com/iframe_api"></script>
     <script>
-        var player, idleTimer, portalData;
+        var player, idleTimer, portalData, currentSpeed = 1;
         const wrapper = document.getElementById('master-player-wrapper');
 
-        // FETCH FROM HIDDEN BINARY FILE
         fetch('system.bin')
             .then(res => res.text())
             .then(scrambled => {
@@ -108,6 +123,8 @@
             document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
             el.classList.add('active');
             wrapper.focus();
+            // Re-apply current speed to new video
+            setTimeout(() => player.setPlaybackRate(parseFloat(currentSpeed)), 1000);
         }
 
         function onYouTubeIframeAPIReady() {
@@ -117,14 +134,29 @@
                     player = new YT.Player('player', {
                         videoId: portalData[0].b[0].u[0].v[0].i,
                         playerVars: { 'controls': 0, 'modestbranding': 1, 'rel': 0 },
-                        events: { 'onStateChange': onStateChange, 'onReady': updateTitle }
+                        events: { 
+                            'onStateChange': (e) => { 
+                                if(e.data == 1) {
+                                    startIdleTimer();
+                                    player.setPlaybackRate(parseFloat(currentSpeed));
+                                } else {
+                                    showUI();
+                                }
+                                updateTitle(); 
+                            }, 
+                            'onReady': updateTitle 
+                        }
                     });
                 }
             }, 100);
             setInterval(updateUI, 500);
         }
 
-        function onStateChange(e) { if(e.data == 1) startIdleTimer(); else showUI(); updateTitle(); }
+        function setSpeed(val) {
+            currentSpeed = val;
+            if(player && player.setPlaybackRate) player.setPlaybackRate(parseFloat(val));
+        }
+
         function updateUI() { if(player && player.getDuration) { var c = player.getCurrentTime(), d = player.getDuration(); document.getElementById('progress').style.width = (c/d*100) + "%"; document.getElementById('time-display').innerText = formatTime(c) + " / " + formatTime(d); } }
         function formatTime(t) { var h=Math.floor(t/3600), m=Math.floor((t%3600)/60), s=Math.floor(t%60); return (h<10?'0'+h:h)+":"+(m<10?'0'+m:m)+":"+(s<10?'0'+s:s); }
         function updateTitle() { try { document.getElementById('current-video-title').innerText = player.getVideoData().title; } catch(e){} }
@@ -133,8 +165,15 @@
         function seek(e) { var r = e.currentTarget.getBoundingClientRect(); player.seekTo(player.getDuration()*((e.clientX-r.left)/r.width), true); }
         function startIdleTimer() { showUI(); clearTimeout(idleTimer); if (document.fullscreenElement) idleTimer = setTimeout(() => wrapper.classList.add('hide-ui'), 3000); }
         function showUI() { wrapper.classList.remove('hide-ui'); }
+        
         wrapper.addEventListener('mousemove', startIdleTimer);
-        wrapper.addEventListener('keydown', (e) => { if(e.code==="Space"){e.preventDefault(); playPause();} if(e.code==="KeyF") goFullscreen(); startIdleTimer(); });
+        wrapper.addEventListener('keydown', (e) => { 
+            if(e.code==="Space"){e.preventDefault(); playPause();} 
+            if(e.code==="KeyF") goFullscreen(); 
+            if(e.code==="ArrowRight") player.seekTo(player.getCurrentTime() + 5, true);
+            if(e.code==="ArrowLeft") player.seekTo(player.getCurrentTime() - 5, true);
+            startIdleTimer(); 
+        });
     </script>
 </body>
 </html>
