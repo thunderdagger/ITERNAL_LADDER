@@ -2,48 +2,44 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>theetarnalraven v4.0.1</title>
+    <title>theetarnalraven v4.0.2</title>
     <style>
-        /* THEETARNALRAVEN CORE THEME */
-        body { background-color: #f7f7f7; color: #333; font-family: "lucida grande", tahoma, verdana, arial, sans-serif; margin: 0; padding: 0; font-size: 11px; overflow-x: hidden; }
+        /* CORE UI */
+        body { background-color: #f7f7f7; color: #333; font-family: "lucida grande", tahoma, verdana, arial, sans-serif; margin: 0; padding: 0; font-size: 11px; }
         .header { background-color: #3b5998; padding: 8px 15px; color: white; border-bottom: 1px solid #29487d; display: flex; align-items: flex-end; justify-content: space-between; }
         .header h1 { font-size: 18px; margin: 0; letter-spacing: -1px; font-weight: bold; }
         .container { display: flex; max-width: 1150px; margin: 20px auto; gap: 15px; padding: 0 10px; }
         
-        /* SIDEBAR ACCORDION */
+        /* SIDEBAR - SIMPLIFIED STABILITY */
         .sidebar { width: 250px; flex-shrink: 0; max-height: 85vh; overflow-y: auto; user-select: none; }
-        .side-box { background: white; border: 1px solid #d8dfea; margin-bottom: 5px; border-radius: 2px; overflow: hidden; }
-        .subject-header { background: #eceff5; padding: 10px; color: #3b5998; font-weight: bold; border-bottom: 1px solid #d8dfea; font-size: 12px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
-        .subject-header:hover { background: #dbe2ef; }
-        .batch-content { display: none; background: #fff; }
+        .side-box { background: white; border: 1px solid #d8dfea; margin-bottom: 5px; border-radius: 2px; }
+        .subject-header { background: #eceff5; padding: 10px; color: #3b5998; font-weight: bold; border-bottom: 1px solid #d8dfea; font-size: 12px; cursor: pointer; }
+        
+        .batch-content { display: none; padding-bottom: 5px; }
         .batch-content.open { display: block; }
-        .batch-group { border-bottom: 1px solid #f0f0f0; }
-        .batch-title { padding: 8px 10px; font-weight: bold; color: #666; font-size: 10px; text-transform: uppercase; cursor: pointer; background: #fafafa; }
-        .batch-title:hover { background: #f0f2f5; color: #3b5998; }
-        .unit-content { display: none; padding-bottom: 5px; }
-        .unit-content.open { display: block; }
-        .unit-title { padding: 5px 20px; color: #3b5998; font-style: italic; font-weight: bold; font-size: 10px; cursor: pointer; border-left: 3px solid #d8dfea; }
-        .unit-title:hover { background: #f0f2f5; border-left-color: #3b5998; }
-        .nav-link { display: block; color: #3b5998; text-decoration: none; padding: 4px 5px 4px 35px; cursor: pointer; border-left: 2px solid transparent; }
+        
+        .unit-title { padding: 8px 10px 3px 10px; color: #666; font-weight: bold; font-size: 10px; text-transform: uppercase; }
+        .nav-link { display: block; color: #3b5998; text-decoration: none; padding: 4px 5px 4px 15px; cursor: pointer; border-left: 2px solid transparent; }
         .nav-link:hover { background-color: #eff2f7; text-decoration: underline; }
         .nav-link.active { background-color: #3b5998; color: white !important; font-weight: bold; border-left: 2px solid #29487d; }
 
         /* PLAYER ENGINE */
-        #master-player-wrapper { position: relative; background: #fff; flex-grow: 1; border: 1px solid #d8dfea; display: flex; flex-direction: column; outline: none; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
-        .video-title-bar { background: #eceff5; border-bottom: 1px solid #d8dfea; padding: 10px 12px; z-index: 100; transition: 0.4s ease; min-height: 15px; }
+        #master-player-wrapper { position: relative; background: #fff; flex-grow: 1; border: 1px solid #d8dfea; display: flex; flex-direction: column; outline: none; overflow: hidden; }
+        .video-title-bar { background: #eceff5; border-bottom: 1px solid #d8dfea; padding: 10px 12px; min-height: 16px; }
         .video-title-bar h2 { margin: 0; font-size: 13px; color: #3b5998; font-weight: bold; }
-        .video-engine { position: relative; width: 100%; aspect-ratio: 16/9; background: #000; z-index: 1; }
+        .video-engine { position: relative; width: 100%; aspect-ratio: 16/9; background: #000; }
         #player { position: absolute; top: -55px; left: 0; width: 100%; height: calc(100% + 110px); pointer-events: none; }
         .shield { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 50; }
         
+        /* LANDING */
         #landing-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: #1a1a1a; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 60; color: white; text-align: center; }
         .portal-logo { font-size: 36px; font-weight: bold; letter-spacing: -2px; color: #3b5998; margin-bottom: 5px; }
         .hidden { display: none !important; }
 
         /* CONTROLS */
-        .floating-ui { background: #eceff5; border-top: 1px solid #3b5998; padding: 10px; z-index: 100; transition: 0.4s ease; }
+        .floating-ui { background: #eceff5; border-top: 1px solid #3b5998; padding: 10px; z-index: 100; }
         .timeline-container { flex-grow: 1; background: #ccc; height: 10px; cursor: pointer; border: 1px solid #999; position: relative; overflow: hidden; margin-bottom: 8px; }
-        .buffer-bar { position: absolute; background: #aaa; height: 100%; width: 0%; z-index: 1; transition: width 0.3s ease; }
+        .buffer-bar { position: absolute; background: #aaa; height: 100%; width: 0%; z-index: 1; }
         .progress-bar { position: absolute; background: #3b5998; height: 100%; width: 0%; z-index: 2; }
         .fb-button { background: #3b5998; color: white; border: 1px solid #29487d; padding: 4px 10px; font-size: 10px; font-weight: bold; cursor: pointer; }
         .speed-select { font-size: 10px; border: 1px solid #bdc7d8; padding: 2px; background: #fff; }
@@ -51,10 +47,10 @@
 </head>
 <body oncontextmenu="return false;">
 
-    <div class="header"><h1>theetarnalraven <span style="font-weight:normal; font-size:10px;">v4.0.1</span></h1></div>
+    <div class="header"><h1>theetarnalraven <span style="font-weight:normal; font-size:10px;">v4.0.2</span></h1></div>
 
     <div class="container">
-        <div class="sidebar" id="main-sidebar">Syncing system...</div>
+        <div id="main-sidebar" class="sidebar">Initializing...</div>
         
         <div id="master-player-wrapper" tabindex="0">
             <div class="video-title-bar"><h2 id="current-video-title">theetarnalraven</h2></div>
@@ -63,7 +59,7 @@
                 <div class="shield"></div>
                 <div id="landing-overlay">
                     <div class="portal-logo">theetarnalraven</div>
-                    <div style="font-size: 13px; opacity: 0.7;">Select a curriculum unit to begin stream</div>
+                    <div style="opacity: 0.7;">Select a lesson to begin stream</div>
                 </div>
             </div>
             <div class="floating-ui">
@@ -73,14 +69,14 @@
                 </div>
                 <div style="display:flex; align-items:center; gap:12px;">
                     <button class="fb-button" onclick="playPause()">PLAY / PAUSE</button>
-                    <div style="font-size:10px; font-weight:bold; color:#3b5998; margin:0 10px;">SPEED: 
+                    <div style="font-size:10px; font-weight:bold; color:#3b5998;">SPEED: 
                         <select id="video-speed" class="speed-select" onchange="setSpeed(this.value)">
                             <option value="1">1.0x</option><option value="1.25">1.25x</option>
                             <option value="1.5">1.5x</option><option value="1.75">1.75x</option>
                             <option value="2">2.0x</option>
                         </select>
                     </div>
-                    <span id="time-display" style="font-family:monospace; font-size:11px;">00:00:00 / 00:00:00</span>
+                    <span id="time-display" style="font-family:monospace;">00:00:00 / 00:00:00</span>
                     <button class="fb-button" onclick="goFullscreen()" style="margin-left:auto;">FULL SCREEN</button>
                 </div>
             </div>
@@ -89,52 +85,42 @@
 
     <script src="https://www.youtube.com/iframe_api"></script>
     <script>
-        var player, idleTimer, portalData, currentSpeed = 1, currentLessonInfo = "";
-        const wrapper = document.getElementById('master-player-wrapper');
-
+        var player, portalData, currentSpeed = 1, currentInfo = "theetarnalraven";
+        
         fetch('system.bin').then(res => res.text()).then(scrambled => {
-            const decoded = decodeURIComponent(escape(atob(scrambled)));
-            portalData = JSON.parse(decoded);
+            portalData = JSON.parse(decodeURIComponent(escape(atob(scrambled))));
             buildSidebar();
-        });
+        }).catch(e => document.getElementById('main-sidebar').innerText = "Data Error");
 
         function buildSidebar() {
-            const sb = document.getElementById('main-sidebar');
             let h = '';
-            portalData.forEach((subject, sIdx) => {
+            portalData.forEach((s, sIdx) => {
                 h += `<div class="side-box">
-                        <div class="subject-header" onclick="toggle('sub-${sIdx}')">${subject.s}</div>
+                        <div class="subject-header" onclick="toggle('sub-${sIdx}')">${s.s}</div>
                         <div class="batch-content" id="sub-${sIdx}">`;
-                subject.b.forEach((batch, bIdx) => {
-                    h += `<div class="batch-group">
-                            <div class="batch-title" onclick="toggle('bat-${sIdx}-${bIdx}')">${batch.y}</div>
-                            <div class="unit-content" id="bat-${sIdx}-${bIdx}">`;
-                    batch.u.forEach((unit, uIdx) => {
-                        h += `<div class="unit-title" onclick="toggle('uni-${sIdx}-${bIdx}-${uIdx}')">${unit.n}</div>
-                              <div class="unit-content" id="uni-${sIdx}-${bIdx}-${uIdx}">`;
-                        unit.v.forEach(video => {
-                            // Capture Batch, Teacher, and Title for the top bar
-                            let info = `${batch.y} | Ruwan Darshana | ${video.t}`;
-                            h += `<div class="nav-link" onclick="handleSwitch('${video.i}', this, '${info}')">${video.t}</div>`;
+                s.b.forEach(b => {
+                    b.u.forEach(u => {
+                        h += `<div class="unit-title">${b.y} | ${u.n}</div>`;
+                        u.v.forEach(v => {
+                            let meta = `${b.y} | Ruwan Darshana | ${v.t}`;
+                            h += `<div class="nav-link" onclick="handleSwitch('${v.i}', this, '${meta}')">${v.t}</div>`;
                         });
-                        h += `</div>`;
                     });
-                    h += `</div></div>`;
                 });
                 h += `</div></div>`;
             });
-            sb.innerHTML = h;
+            document.getElementById('main-sidebar').innerHTML = h;
         }
 
         function toggle(id) { document.getElementById(id).classList.toggle('open'); }
 
         function handleSwitch(id, el, info) { 
             document.getElementById('landing-overlay').classList.add('hidden');
-            currentLessonInfo = info;
+            currentInfo = info;
             player.loadVideoById(id);
             document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
             el.classList.add('active');
-            wrapper.focus();
+            updateTitle();
             setTimeout(() => player.setPlaybackRate(parseFloat(currentSpeed)), 1000);
         }
 
@@ -145,50 +131,27 @@
                     player = new YT.Player('player', {
                         videoId: portalData[0].b[0].u[0].v[0].i,
                         playerVars: { 'controls': 0, 'modestbranding': 1, 'rel': 0 },
-                        events: { 
-                            'onStateChange': (e) => { if(e.data == 1) startIdleTimer(); else showUI(); updateTitle(); }, 
-                            'onReady': updateTitle 
-                        }
+                        events: { 'onStateChange': (e) => { updateTitle(); }, 'onReady': updateTitle }
                     });
                 }
             }, 100);
             setInterval(updateUI, 500);
         }
 
-        // PATCHED: updateTitle now intelligently switches between Brand and Lesson Info
-        function updateTitle() { 
-            const titleEl = document.getElementById('current-video-title');
-            if (document.getElementById('landing-overlay').classList.contains('hidden')) {
-                titleEl.innerText = currentLessonInfo;
-            } else {
-                titleEl.innerText = "theetarnalraven";
-            }
-        }
-
+        function updateTitle() { document.getElementById('current-video-title').innerText = currentInfo; }
         function setSpeed(v) { currentSpeed = v; if(player) player.setPlaybackRate(parseFloat(v)); }
         function updateUI() { 
-            if(player && player.getDuration) { 
+            if(player && player.getDuration) {
                 var c = player.getCurrentTime(), d = player.getDuration(), b = player.getVideoLoadedFraction(); 
                 document.getElementById('progress').style.width = (c/d*100) + "%";
                 document.getElementById('buffer').style.width = (b*100) + "%";
-                document.getElementById('time-display').innerText = formatTime(c) + " / " + formatTime(d); 
-            } 
+                document.getElementById('time-display').innerText = formatTime(c) + " / " + formatTime(d);
+            }
         }
         function formatTime(t) { var h=Math.floor(t/3600), m=Math.floor((t%3600)/60), s=Math.floor(t%60); return (h<10?'0'+h:h)+":"+(m<10?'0'+m:m)+":"+(s<10?'0'+s:s); }
         function playPause() { (player.getPlayerState()==1)?player.pauseVideo():player.playVideo(); }
-        function goFullscreen() { if(!document.fullscreenElement) wrapper.requestFullscreen(); else document.exitFullscreen(); }
+        function goFullscreen() { var w = document.getElementById('master-player-wrapper'); if(!document.fullscreenElement) w.requestFullscreen(); else document.exitFullscreen(); }
         function seek(e) { var r = e.currentTarget.getBoundingClientRect(); player.seekTo(player.getDuration()*((e.clientX-r.left)/r.width), true); }
-        function startIdleTimer() { showUI(); clearTimeout(idleTimer); if (document.fullscreenElement) idleTimer = setTimeout(() => wrapper.classList.add('hide-ui'), 3000); }
-        function showUI() { wrapper.classList.remove('hide-ui'); }
-        
-        wrapper.addEventListener('mousemove', startIdleTimer);
-        wrapper.addEventListener('keydown', (e) => { 
-            if(e.code==="Space"){e.preventDefault(); playPause();} 
-            if(e.code==="KeyF") goFullscreen(); 
-            if(e.code==="ArrowRight") player.seekTo(player.getCurrentTime() + 10, true);
-            if(e.code==="ArrowLeft") player.seekTo(player.getCurrentTime() - 10, true);
-            startIdleTimer(); 
-        });
     </script>
 </body>
 </html>
