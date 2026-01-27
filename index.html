@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>theeternalladder v3.2.0</title>
+    <title>theeternalladder v3.2.1</title>
     <style>
         /* BASE THEME */
         body { background-color: #f7f7f7; color: #333; font-family: "lucida grande", tahoma, verdana, arial, sans-serif; margin: 0; padding: 0; font-size: 11px; overflow-x: hidden; }
@@ -10,23 +10,19 @@
         .header h1 { font-size: 18px; margin: 0; letter-spacing: -1px; font-weight: bold; }
         .container { display: flex; max-width: 1150px; margin: 20px auto; gap: 15px; padding: 0 10px; }
         
-        /* SIDEBAR TREE & COLLAPSING */
+        /* SIDEBAR TREE & COLLAPSE STYLES */
         .sidebar { width: 250px; flex-shrink: 0; max-height: 85vh; overflow-y: auto; user-select: none; }
         .side-box { background: white; border: 1px solid #d8dfea; margin-bottom: 10px; border-radius: 2px; }
-        
         .subject-header { background: #eceff5; padding: 8px 10px; color: #3b5998; font-weight: bold; border-bottom: 1px solid #d8dfea; font-size: 12px; cursor: pointer; }
-        .subject-header:hover { background: #dbe2ef; }
-
-        .batch-container, .unit-container { display: none; } /* Hidden by default */
-        .open { display: block !important; }
-
+        
         .batch-group { padding: 5px 0 5px 10px; border-bottom: 1px solid #f0f0f0; }
-        .batch-title { font-weight: bold; color: #666; font-size: 10px; text-transform: uppercase; cursor: pointer; padding: 2px 0; }
-        .batch-title:hover { color: #3b5998; }
-
+        .batch-title { font-weight: bold; color: #666; font-size: 10px; text-transform: uppercase; cursor: pointer; }
         .unit-group { padding-left: 10px; margin-top: 5px; }
         .unit-title { color: #3b5998; font-style: italic; margin-bottom: 3px; font-weight: bold; cursor: pointer; }
-        .unit-title:hover { text-decoration: underline; }
+        
+        /* COLLAPSE LOGIC */
+        .collapse-content { display: none; }
+        .show { display: block; }
 
         .nav-link { display: block; color: #3b5998; text-decoration: none; padding: 4px 5px 4px 15px; cursor: pointer; border-left: 2px solid transparent; }
         .nav-link:hover { background-color: #eff2f7; text-decoration: underline; }
@@ -57,7 +53,7 @@
 </head>
 <body oncontextmenu="return false;">
 
-    <div class="header"><h1>theeternalladder <span style="font-weight:normal; font-size:10px;">v3.2.0</span></h1></div>
+    <div class="header"><h1>theeternalladder <span style="font-weight:normal; font-size:10px;">v3.1.9</span></h1></div>
 
     <div class="container">
         <div class="sidebar" id="main-sidebar">Fetching system data...</div>
@@ -102,33 +98,26 @@
         fetch('system.bin')
             .then(res => res.text())
             .then(scrambled => {
-                portalData = JSON.parse(decodeURIComponent(escape(atob(scrambled))));
+                const decoded = decodeURIComponent(escape(atob(scrambled)));
+                portalData = JSON.parse(decoded);
                 buildSidebar();
-            })
-            .catch(err => { document.getElementById('main-sidebar').innerText = "System file missing."; });
+            });
 
-        // SIMPLE TOGGLE FUNCTION
-        function toggleSection(e) {
+        function toggle(e) {
             e.stopPropagation();
-            const target = e.currentTarget.nextElementSibling;
-            if (target) target.classList.toggle('open');
+            let next = e.currentTarget.nextElementSibling;
+            if(next) next.classList.toggle('show');
         }
 
         function buildSidebar() {
             const sb = document.getElementById('main-sidebar');
             let h = '';
-            portalData.forEach((subject, sIdx) => {
-                h += `<div class="side-box">
-                        <div class="subject-header" onclick="toggleSection(event)">${subject.s}</div>
-                        <div class="batch-container">`;
-                subject.b.forEach((batch, bIdx) => {
-                    h += `<div class="batch-group">
-                            <div class="batch-title" onclick="toggleSection(event)">${batch.y}</div>
-                            <div class="unit-container">`;
-                    batch.u.forEach((unit, uIdx) => {
-                        h += `<div class="unit-group">
-                                <div class="unit-title" onclick="toggleSection(event)">${unit.n}</div>
-                                <div class="unit-container">`;
+            portalData.forEach(subject => {
+                h += `<div class="side-box"><div class="subject-header" onclick="toggle(event)">${subject.s}</div><div class="collapse-content">`;
+                subject.b.forEach(batch => {
+                    h += `<div class="batch-group"><div class="batch-title" onclick="toggle(event)">${batch.y}</div><div class="collapse-content">`;
+                    batch.u.forEach(unit => {
+                        h += `<div class="unit-group"><div class="unit-title" onclick="toggle(event)">${unit.n}</div><div class="collapse-content">`;
                         unit.v.forEach(video => {
                             h += `<div class="nav-link" onclick="handleSwitch('${video.i}', this)">${video.t}</div>`;
                         });
@@ -160,10 +149,8 @@
                         events: { 
                             'onStateChange': (e) => { 
                                 if(e.data == 1) { startIdleTimer(); player.setPlaybackRate(parseFloat(currentSpeed)); } 
-                                else { showUI(); }
                                 updateTitle(); 
-                            }, 
-                            'onReady': updateTitle 
+                            }
                         }
                     });
                 }
@@ -173,7 +160,7 @@
 
         function setSpeed(val) { currentSpeed = val; if(player && player.setPlaybackRate) player.setPlaybackRate(parseFloat(val)); }
         function updateUI() { 
-            if(player && player.getDuration && player.getCurrentTime) { 
+            if(player && player.getDuration) { 
                 var c = player.getCurrentTime(), d = player.getDuration(), b = player.getVideoLoadedFraction(); 
                 document.getElementById('progress').style.width = (c/d*100) + "%";
                 document.getElementById('buffer').style.width = (b*100) + "%";
