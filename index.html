@@ -40,7 +40,7 @@
         .start-hint { font-size: 13px; opacity: 0.7; font-weight: normal; }
         .hidden { display: none !important; }
 
-        /* CONTROLS & FULLSCREEN FIX */
+        /* CONTROLS & FULLSCREEN */
         .floating-ui { background: #eceff5; border-top: 1px solid #3b5998; padding: 10px; z-index: 100; transition: 0.4s ease; }
         #master-player-wrapper:fullscreen .video-title-bar { position: absolute; top: 0; width: 100%; background: rgba(236,239,245,0.9); }
         #master-player-wrapper:fullscreen .floating-ui { position: absolute; bottom: 0; width: 100%; background: rgba(236,239,245,0.9); box-sizing: border-box; }
@@ -116,7 +116,7 @@
 
         function buildSidebar() {
             const sb = document.getElementById('main-sidebar');
-            let h = '<div class="side-box"><div class="subject-header">Welcome</div></div>';
+            let h = '';
             portalData.forEach(subject => {
                 h += `<div class="side-box"><div class="subject-header" onclick="toggle(event)">${subject.s} ⌵</div><div class="collapse-content">`;
                 subject.b.forEach(batch => {
@@ -138,6 +138,7 @@
         function handleSwitch(id, el) { 
             document.getElementById('landing-overlay').classList.add('hidden');
             player.loadVideoById(id);
+            document.getElementById('current-video-title').innerText = el.innerText;
             document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
             el.classList.add('active');
             wrapper.focus();
@@ -155,9 +156,7 @@
                             'onStateChange': (e) => { 
                                 if(e.data == 1) { startIdleTimer(); player.setPlaybackRate(parseFloat(currentSpeed)); } 
                                 else { showUI(); }
-                                updateTitle(); 
-                            }, 
-                            'onReady': updateTitle 
+                            }
                         }
                     });
                 }
@@ -175,7 +174,6 @@
             } 
         }
         function formatTime(t) { var h=Math.floor(t/3600), m=Math.floor((t%3600)/60), s=Math.floor(t%60); return (h<10?'0'+h:h)+":"+(m<10?'0'+m:m)+":"+(s<10?'0'+s:s); }
-        function updateTitle() { try { document.getElementById('current-video-title').innerText = player.getVideoData().title; } catch(e){} }
         function playPause() { (player.getPlayerState()==1)?player.pauseVideo():player.playVideo(); }
         function goFullscreen() { if(!document.fullscreenElement) wrapper.requestFullscreen(); else document.exitFullscreen(); }
         function seek(e) { var r = e.currentTarget.getBoundingClientRect(); player.seekTo(player.getDuration()*((e.clientX-r.left)/r.width), true); }
