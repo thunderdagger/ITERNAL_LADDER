@@ -9,33 +9,24 @@
         .header h1 { font-size: 18px; margin: 0; letter-spacing: -1px; font-weight: bold; }
         .container { display: flex; max-width: 950px; margin: 20px auto; gap: 15px; }
         
-        /* Sidebar */
         .sidebar { width: 150px; flex-shrink: 0; }
         .side-box { background: white; border: 1px solid #d8dfea; margin-bottom: 10px; padding: 5px; }
         .side-header { background-color: #eceff5; padding: 3px 5px; color: #3b5998; font-weight: bold; margin-bottom: 5px; border-bottom: 1px solid #d8dfea; }
         .nav-link { display: block; color: #3b5998; text-decoration: none; padding: 3px 5px; cursor: pointer; }
         .nav-link.active { background-color: #3b5998; color: white; }
 
-        /* THE MASTER WRAPPER */
-        #master-player-wrapper { 
-            position: relative; 
-            background: #000; 
-            flex-grow: 1; 
-            overflow: hidden; 
-            border: 1px solid #d8dfea; 
-            line-height: 0; 
-        }
+        /* MASTER WRAPPER */
+        #master-player-wrapper { position: relative; background: #000; flex-grow: 1; overflow: hidden; border: 1px solid #d8dfea; line-height: 0; cursor: default; }
         
-        /* FULLSCREEN ADJUSTMENTS */
-        #master-player-wrapper:fullscreen { border: none; width: 100vw; height: 100vh; cursor: none; }
-        #master-player-wrapper:fullscreen .video-engine { max-width: 100% !important; height: 100% !important; }
-        
-        /* Bring cursor back when moving mouse */
-        #master-player-wrapper:fullscreen:hover { cursor: default; }
+        /* Hide cursor when controls are hidden */
+        #master-player-wrapper.hide-ui { cursor: none; }
+
+        #master-player-wrapper:fullscreen { border: none; width: 100vw; height: 100vh; }
+        #master-player-wrapper:fullscreen .video-engine { max-width: 100%; height: 100%; border: none; }
 
         .video-engine { position: relative; width: 100%; max-width: 854px; aspect-ratio: 16/9; overflow: hidden; background: #000; margin: 0 auto; z-index: 1; }
         #player { position: absolute; top: -55px; left: 0; width: 100%; height: calc(100% + 110px); pointer-events: none; }
-        .shield { position: absolute; top: 0; left: 0; width: 100%; height: 85%; z-index: 2; }
+        .shield { position: absolute; top: 0; left: 0; width: 100%; height: 80%; z-index: 2; }
 
         /* FLOATING UI */
         .floating-ui {
@@ -43,35 +34,30 @@
             bottom: 0;
             left: 0;
             right: 0;
-            background: rgba(236, 239, 245, 0.92); 
+            background: rgba(236, 239, 245, 0.92);
             border-top: 1px solid #3b5998;
-            padding: 8px 15px;
+            padding: 10px;
             z-index: 10;
-            transform: translateY(100%); /* Start hidden */
-            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            line-height: normal;
-        }
-
-        /* IN FULLSCREEN: Make UI float higher and look cleaner */
-        #master-player-wrapper:fullscreen .floating-ui {
-            background: rgba(255, 255, 255, 0.9);
-            padding: 15px 30px;
-        }
-
-        /* THE TRIGGER ZONE: If mouse is in the bottom 60px of the wrapper, show UI */
-        #master-player-wrapper:hover .floating-ui {
             transform: translateY(0);
+            transition: transform 0.4s ease, opacity 0.4s ease;
+            line-height: normal;
+            opacity: 1;
         }
 
-        .timeline-wrapper { display: flex; align-items: center; gap: 10px; margin-bottom: 5px; }
-        .timeline-container { flex-grow: 1; background: #ccc; height: 8px; cursor: pointer; border-radius: 4px; position: relative; overflow: hidden; }
-        .progress-bar { background: #3b5998; height: 100%; width: 0%; transition: width 0.1s linear; }
-        #time-display { font-family: monospace; color: #333; font-size: 11px; min-width: 130px; text-align: right; }
+        /* The class that hides the UI */
+        .hide-ui .floating-ui {
+            transform: translateY(100%);
+            opacity: 0;
+        }
 
-        .custom-controls { display: flex; align-items: center; gap: 20px; }
+        .timeline-wrapper { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+        .timeline-container { flex-grow: 1; background: #ddd; height: 10px; cursor: pointer; border: 1px solid #999; position: relative; }
+        .progress-bar { background: #3b5998; height: 100%; width: 0%; transition: width 0.1s linear; }
+        #time-display { font-family: monospace; color: #333; font-size: 11px; min-width: 120px; text-align: right; }
+
+        .custom-controls { display: flex; align-items: center; gap: 15px; }
         .fb-button { background: #3b5998; color: white; border: 1px solid #29487d; padding: 4px 12px; font-size: 11px; font-weight: bold; cursor: pointer; }
-        .fb-button:hover { background: #4c70ba; }
-        select, input { font-size: 11px; border: 1px solid #bdc7d8; padding: 2px; }
+        select, input { font-size: 11px; border: 1px solid #bdc7d8; }
     </style>
 </head>
 <body>
@@ -96,7 +82,7 @@
                 <div class="shield" oncontextmenu="return false;"></div>
             </div>
 
-            <div class="floating-ui">
+            <div class="floating-ui" id="controls-bar">
                 <div class="timeline-wrapper">
                     <div class="timeline-container" id="timeline" onclick="seek(event)">
                         <div class="progress-bar" id="progress"></div>
@@ -109,13 +95,12 @@
                     <span style="font-weight:bold; color:#3b5998;">SPD: 
                         <select onchange="setSpeed(this.value)">
                             <option value="1">1x</option>
-                            <option value="1.25">1.25x</option>
                             <option value="1.5">1.5x</option>
                             <option value="2">2x</option>
                         </select>
                     </span>
                     <span style="font-weight:bold; color:#3b5998;">VOL: <input type="range" min="0" max="100" value="100" oninput="setVolume(this.value)" style="width:70px;"></span>
-                    <button class="fb-button" onclick="goFullscreen()" style="margin-left:auto;">EXIT / FULL SCREEN</button>
+                    <button class="fb-button" onclick="goFullscreen()" style="margin-left:auto;">FULL SCREEN</button>
                 </div>
             </div>
         </div>
@@ -125,6 +110,8 @@
     <script>
         var player;
         var progressInterval;
+        var idleTimer;
+        const wrapper = document.getElementById('master-player-wrapper');
 
         function onYouTubeIframeAPIReady() {
             player = new YT.Player('player', {
@@ -134,11 +121,27 @@
             });
         }
 
+        // --- AUTO-HIDE LOGIC ---
+        function resetIdleTimer() {
+            wrapper.classList.remove('hide-ui');
+            clearTimeout(idleTimer);
+            // Auto-hide after 3 seconds of no movement
+            idleTimer = setTimeout(() => {
+                wrapper.classList.add('hide-ui');
+            }, 3000);
+        }
+
+        wrapper.addEventListener('mousemove', resetIdleTimer);
+        wrapper.addEventListener('click', resetIdleTimer);
+
         function onPlayerStateChange(event) {
             if (event.data == 1) {
                 progressInterval = setInterval(updateUI, 500);
+                resetIdleTimer();
             } else {
                 clearInterval(progressInterval);
+                wrapper.classList.remove('hide-ui'); // Keep UI visible if paused
+                clearTimeout(idleTimer);
             }
         }
 
@@ -172,12 +175,8 @@
 
         function goFullscreen() {
             var el = document.getElementById('master-player-wrapper');
-            if (!document.fullscreenElement) {
-                if (el.requestFullscreen) el.requestFullscreen();
-                else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen();
-            } else {
-                if (document.exitFullscreen) document.exitFullscreen();
-            }
+            if (el.requestFullscreen) { el.requestFullscreen(); }
+            else if (el.webkitRequestFullscreen) { el.webkitRequestFullscreen(); }
         }
 
         function loadNewVideo(id, el) {
