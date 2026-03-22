@@ -5,50 +5,53 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>theeternalladder v3.3.14</title>
     <style>
-        /* CORE THEME */
+        /* ORIGINAL 2000s THEME */
         body { background-color: #f7f7f7; color: #333; font-family: "lucida grande", tahoma, verdana, arial, sans-serif; margin: 0; padding: 0; font-size: 11px; overflow-x: hidden; }
-        .header { background-color: #3b5998; padding: 10px 15px; color: white; border-bottom: 1px solid #29487d; display: flex; align-items: center; justify-content: space-between; }
+        .header { background-color: #3b5998; padding: 8px 15px; color: white; border-bottom: 1px solid #29487d; display: flex; align-items: flex-end; justify-content: space-between; }
         .header h1 { font-size: 18px; margin: 0; letter-spacing: -1px; font-weight: bold; }
         
-        .container { display: flex; max-width: 1150px; margin: 10px auto; gap: 15px; padding: 0 10px; flex-direction: row; }
-
-        /* SIDEBAR */
+        /* DESKTOP LAYOUT */
+        .container { display: flex; max-width: 1150px; margin: 20px auto; gap: 15px; padding: 0 10px; }
+        
         .sidebar { width: 250px; flex-shrink: 0; max-height: 85vh; overflow-y: auto; user-select: none; }
         .side-box { background: white; border: 1px solid #d8dfea; margin-bottom: 5px; border-radius: 2px; overflow: hidden; }
-        .subject-header { background: #eceff5; padding: 12px; color: #3b5998; font-weight: bold; border-bottom: 1px solid #d8dfea; font-size: 12px; cursor: pointer; }
+        .subject-header { background: #eceff5; padding: 10px; color: #3b5998; font-weight: bold; border-bottom: 1px solid #d8dfea; font-size: 12px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
+        .subject-header:hover { background: #dbe2ef; }
         .batch-content { display: none; background: #fff; }
         .batch-content.open { display: block; }
-        .batch-title { padding: 10px; font-weight: bold; color: #666; font-size: 10px; text-transform: uppercase; cursor: pointer; background: #fafafa; border-bottom: 1px solid #eee; }
+        .batch-group { border-bottom: 1px solid #f0f0f0; }
+        .batch-title { padding: 8px 10px; font-weight: bold; color: #666; font-size: 10px; text-transform: uppercase; cursor: pointer; background: #fafafa; }
         .unit-content { display: none; padding-bottom: 5px; }
         .unit-content.open { display: block; }
-        .unit-title { padding: 8px 20px; color: #3b5998; font-style: italic; font-weight: bold; font-size: 11px; cursor: pointer; border-left: 3px solid #d8dfea; }
-        .nav-link { display: block; color: #3b5998; text-decoration: none; padding: 10px 10px 10px 35px; cursor: pointer; border-left: 2px solid transparent; font-size: 12px; }
-        .nav-link:hover { background-color: #eff2f7; }
-        .nav-link.active { background-color: #3b5998; color: white !important; font-weight: bold; }
+        .unit-title { padding: 5px 20px; color: #3b5998; font-style: italic; font-weight: bold; font-size: 10px; cursor: pointer; border-left: 3px solid #d8dfea; }
+        .nav-link { display: block; color: #3b5998; text-decoration: none; padding: 8px 5px 8px 35px; cursor: pointer; border-left: 2px solid transparent; }
+        .nav-link:hover { background-color: #eff2f7; text-decoration: underline; }
+        .nav-link.active { background-color: #3b5998; color: white !important; font-weight: bold; border-left: 2px solid #29487d; }
 
-        /* PLAYER WRAPPER */
-        #master-player-wrapper { display: none; position: relative; background: #fff; flex-grow: 1; border: 1px solid #d8dfea; flex-direction: column; overflow: hidden; }
-        .video-title-bar { background: #eceff5; border-bottom: 1px solid #d8dfea; padding: 10px; }
-        .video-title-bar h2 { margin: 0; font-size: 13px; color: #3b5998; }
-        .video-engine { position: relative; width: 100%; aspect-ratio: 16/9; background: #000; }
+        #master-player-wrapper { display: none; position: relative; background: #fff; flex-grow: 1; border: 1px solid #d8dfea; flex-direction: column; outline: none; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        .video-title-bar { background: #eceff5; border-bottom: 1px solid #d8dfea; padding: 10px 12px; z-index: 100; }
+        .video-title-bar h2 { margin: 0; font-size: 13px; color: #3b5998; font-weight: bold; }
+        .video-engine { position: relative; width: 100%; aspect-ratio: 16/9; background: #000; z-index: 1; overflow: hidden;}
         #player { position: absolute; top: -55px; left: 0; width: 100%; height: calc(100% + 110px); pointer-events: none; }
         .shield { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 50; cursor: pointer; }
         
-        .floating-ui { background: #eceff5; border-top: 1px solid #3b5998; padding: 10px; }
-        .timeline-container { height: 12px; background: #ccc; cursor: pointer; margin-bottom: 8px; position: relative; }
-        .progress-bar { position: absolute; background: #3b5998; height: 100%; width: 0%; }
-        .fb-button { background: #3b5998; color: white; border: 1px solid #29487d; padding: 6px 10px; font-size: 10px; font-weight: bold; }
-        .res-sel { background: #fff; color: #3b5998; border: 1px solid #3b5998; padding: 5px; font-size: 10px; }
+        .floating-ui { background: #eceff5; border-top: 1px solid #3b5998; padding: 10px; z-index: 100; }
+        .timeline-container { flex-grow: 1; background: #ccc; height: 10px; cursor: pointer; border: 1px solid #999; position: relative; overflow: hidden; margin-bottom: 8px; }
+        .progress-bar { position: absolute; background: #3b5998; height: 100%; width: 0%; z-index: 2; }
+        .fb-button { background: #3b5998; color: white; border: 1px solid #29487d; padding: 6px 12px; font-size: 10px; font-weight: bold; cursor: pointer; }
+        .res-sel { background: #fff; color: #3b5998; border: 1px solid #3b5998; padding: 5px; font-size: 10px; font-weight: bold; cursor: pointer; }
 
         #welcome-msg { flex-grow: 1; display: flex; align-items: center; justify-content: center; color: #999; font-style: italic; border: 1px dashed #ccc; background: #fff; min-height: 200px; }
 
-        /* MOBILE RESPONSIVE LOGIC */
+        /* MOBILE OVERRIDES */
         @media (max-width: 768px) {
-            .container { flex-direction: column; }
-            .sidebar { width: 100%; max-height: none; order: 2; }
-            #master-player-wrapper, #welcome-msg { width: 100%; order: 1; }
+            .container { flex-direction: column; margin: 10px auto; }
+            .sidebar { width: 100%; max-height: 300px; order: 2; }
+            #master-player-wrapper { order: 1; margin-bottom: 15px; }
+            #welcome-msg { order: 1; margin-bottom: 15px; }
             .header h1 { font-size: 16px; }
-            .fb-button { padding: 8px 12px; } /* Larger buttons for fingers */
+            .fb-button, .res-sel { padding: 10px; font-size: 11px; } /* Larger touch targets */
+            #time-display { font-size: 9px; }
         }
     </style>
 </head>
@@ -57,7 +60,9 @@
     <div class="header"><h1>theeternalladder <span style="font-weight:normal; font-size:10px;">v3.3.14</span></h1></div>
 
     <div class="container">
-        <div id="welcome-msg">Select a lesson from below to begin.</div>
+        <div class="sidebar" id="main-sidebar">Loading system...</div>
+        
+        <div id="welcome-msg">Select a lesson from the sidebar to begin.</div>
 
         <div id="master-player-wrapper">
             <div class="video-title-bar"><h2 id="current-video-title">Loading...</h2></div>
@@ -72,18 +77,19 @@
                 </div>
                 <div style="display:flex; align-items:center; gap:8px; flex-wrap: wrap;">
                     <button class="fb-button" onclick="playPause()">PLAY / PAUSE</button>
+                    
                     <select id="res-selector" class="res-sel" onchange="updateResolution(this.value)">
                         <option value="small" selected>360p</option>
                         <option value="medium">480p</option>
                         <option value="hd720">720p</option>
+                        <option value="hd1080">1080p</option>
                     </select>
-                    <span id="time-display" style="font-family:monospace; font-size:10px;">00:00:00</span>
-                    <button class="fb-button" onclick="goFullscreen()" style="margin-left:auto;">FULL SCREEN</button>
+
+                    <span id="time-display" style="font-family:monospace;">00:00:00 / 00:00:00</span>
+                    <button class="fb-button" onclick="goFullscreen()" style="margin-left:auto;">FULL</button>
                 </div>
             </div>
         </div>
-
-        <div class="sidebar" id="main-sidebar">Loading subjects...</div>
     </div>
 
     <script src="https://www.youtube.com/iframe_api"></script>
@@ -105,7 +111,7 @@
             const sb = document.getElementById('main-sidebar');
             let h = '';
             portalData.forEach((subject, sIdx) => {
-                h += `<div class="side-box"><div class="subject-header" onclick="toggle('sub-${sIdx}')">${subject.s}</div><div class="batch-content" id="sub-${sIdx}">`;
+                h += `<div class="side-box"><div class="subject-header" onclick="toggle('sub-${sIdx}')">${subject.s} <span>+</span></div><div class="batch-content" id="sub-${sIdx}">`;
                 subject.b.forEach((batch, bIdx) => {
                     h += `<div class="batch-group"><div class="batch-title" onclick="toggle('bat-${sIdx}-${bIdx}')">${batch.y}</div><div class="unit-content" id="bat-${sIdx}-${bIdx}">`;
                     batch.u.forEach((unit, uIdx) => {
@@ -127,22 +133,19 @@
         function handleSwitch(id, el) { 
             welcome.style.display = 'none';
             wrapper.style.display = 'flex';
-
             player.loadVideoById({'videoId': id, 'suggestedQuality': currentTargetRes});
             document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
             el.classList.add('active');
-
-            // MOBILE AUTO-SCROLL: Bring the video back into view
-            if(window.innerWidth <= 768) {
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-            }
+            // Scroll to top on mobile so they see the player
+            if(window.innerWidth < 768) window.scrollTo({top: 0, behavior: 'smooth'});
         }
 
         function updateResolution(val) {
             currentTargetRes = val;
             if(player && player.loadVideoById) {
                 const now = player.getCurrentTime();
-                player.loadVideoById({ 'videoId': player.getVideoData().video_id, 'startSeconds': now, 'suggestedQuality': val });
+                const id = player.getVideoData().video_id;
+                player.loadVideoById({'videoId': id, 'startSeconds': now, 'suggestedQuality': val});
             }
         }
 
