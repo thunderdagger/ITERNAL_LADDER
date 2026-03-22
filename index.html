@@ -41,18 +41,22 @@
         .fb-button { background: #3b5998; color: white; border: 1px solid #29487d; padding: 4px 10px; font-size: 10px; font-weight: bold; cursor: pointer; }
         .res-sel { background: #fff; color: #3b5998; border: 1px solid #3b5998; padding: 3px; font-size: 10px; font-weight: bold; cursor: pointer; }
 
-        /* WELCOME PORTAL & BRANDING */
-        #welcome-portal { flex-grow: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #fff; border: 1px solid #d8dfea; text-align: center; min-height: 500px;}
+        /* STEALTH FULLSCREEN LOGIC (FIXED) */
+        #master-player-wrapper:fullscreen .video-title-bar, 
+        #master-player-wrapper:fullscreen .floating-ui { position: absolute; width: 100%; background: rgba(236,239,245,0.9); box-sizing: border-box; z-index: 101; }
+        #master-player-wrapper:fullscreen .video-title-bar { top: 0; }
+        #master-player-wrapper:fullscreen .floating-ui { bottom: 0; }
+        #master-player-wrapper.ui-hidden { cursor: none; }
+        #master-player-wrapper.ui-hidden .video-title-bar { transform: translateY(-100%); opacity: 0; }
+        #master-player-wrapper.ui-hidden .floating-ui { transform: translateY(100%); opacity: 0; }
+
+        /* WELCOME PORTAL */
+        #welcome-portal { flex-grow: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #fff; border: 1px solid #d8dfea; text-align: center; min-height: 500px; }
         .welcome-box { padding: 40px; border: 1px solid #e9ebee; background: #ffffff; max-width: 700px; width: 90%; }
-        
         .alert-banner { background: #f0f7ff; border: 1px solid #d0e3ff; border-radius: 4px; padding: 15px; margin-bottom: 30px; display: flex; align-items: flex-start; gap: 15px; text-align: left; }
-        .alert-icon { font-size: 20px; }
         .alert-title { font-weight: bold; color: #1c1e21; font-size: 14px; margin-bottom: 4px; }
-        .alert-title span { color: #606770; font-weight: normal; }
         .alert-tag { background: #ffffff; border: 1px solid #d0e3ff; color: #1877f2; padding: 3px 8px; border-radius: 4px; font-size: 11px; font-weight: bold; display: inline-block; margin-bottom: 10px; }
         .alert-body { color: #606770; line-height: 1.6; font-size: 12px; }
-        .alert-link { color: #3b5998; text-decoration: none; font-weight: bold; border-bottom: 1px solid #3b5998; }
-
         .brand-title { color: #3b5998; font-size: 32px; margin: 0; letter-spacing: -2px; font-weight: bold; }
         .brand-sub { color: #606770; font-size: 14px; margin: 5px 0 20px 0; }
         .status-line { border-top: 1px solid #e9ebee; padding-top: 20px; color: #999; display: flex; align-items: center; justify-content: center; gap: 8px; }
@@ -61,7 +65,6 @@
         /* FOOTER */
         .site-footer { background: #1c1e21; color: #8d949e; padding: 40px 20px; text-align: center; border-top: 4px solid #3b5998; margin-top: 40px; }
         .footer-desc { max-width: 800px; margin: 0 auto 15px; line-height: 1.6; font-size: 12px; }
-        .footer-desc b { color: #fff; }
         .footer-legal { color: #ffb400; font-weight: bold; margin-bottom: 20px; font-size: 12px; }
         .footer-copy { font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: #606770; }
     </style>
@@ -78,24 +81,19 @@
         <div id="welcome-portal">
             <div class="welcome-box">
                 <div class="alert-banner">
-                    <div class="alert-icon">⚠️</div>
+                    <div style="font-size:20px;">⚠️</div>
                     <div>
                         <div class="alert-title">Not so fast Mate ; <span>Do this first</span></div>
                         <div class="alert-tag">✓ Recommended: Use Firefox + uBlock Origin.</div>
                         <div class="alert-body">
                             Firefox is the top non-Chromium browser, offering nice security and privacy features. 
-                            It also boasts the <span class="alert-link">best compatibility</span> with uBlock Origin for effectively blocking ads and other harmful web content.
+                            It also boasts the <span style="color:#3b5998;font-weight:bold;border-bottom:1px solid #3b5998;">best compatibility</span> with uBlock Origin for effectively blocking ads and other harmful web content.
                         </div>
                     </div>
                 </div>
-
                 <h2 class="brand-title">theeternalladder</h2>
                 <p class="brand-sub">Knowledge Management System</p>
-                
-                <div class="status-line">
-                    <span class="status-dot"></span> 
-                    <span>Select Lessons From The SideBar</span>
-                </div>
+                <div class="status-line"><span class="status-dot"></span> <span>Select Lessons From The SideBar</span></div>
             </div>
         </div>
 
@@ -122,16 +120,9 @@
     </div>
 
     <footer class="site-footer">
-        <div class="footer-desc">
-            <b>eternalladdder</b> is a streaming website, where to watch lessons online without registration required. 
-            With a big database and great features, we're confident this is the best educational space that you can't simply miss!
-        </div>
-        <div class="footer-legal">
-            This site does not store any files on our server, we only linked to the media which is hosted on 3rd party services.
-        </div>
-        <div class="footer-copy">
-            &copy; <span id="copyright-year">2026</span> eternalladdder. All Rights Reserved
-        </div>
+        <div class="footer-desc"><b>eternalladdder</b> is a streaming website... [Database Confidence Statement]</div>
+        <div class="footer-legal">This site does not store any files on our server, we only linked to the media which is hosted on 3rd party services.</div>
+        <div class="footer-copy">&copy; <span id="copyright-year">2026</span> eternalladdder. All Rights Reserved</div>
     </footer>
 
     <script src="https://www.youtube.com/iframe_api"></script>
@@ -139,11 +130,9 @@
         const _0xPA = [108, 97, 100, 100, 101, 114];
         var player, portalData, hideTimeout;
         var currentTargetRes = 'hd720';
-
         const wrapper = document.getElementById('master-player-wrapper');
         const welcome = document.getElementById('welcome-portal');
 
-        // Auto-update Footer Year
         document.getElementById('copyright-year').innerText = new Date().getFullYear();
 
         async function bootSystem() {
@@ -151,18 +140,12 @@
                 const k1 = _0xPA.map(c => String.fromCharCode(c)).join('');
                 const k2 = document.getElementById('_legacy_data').dataset.v;
                 const MASTER = k1 + k2; 
-
                 const response = await fetch('system.bin');
                 const encrypted = await response.text();
-                
                 const bytes = CryptoJS.AES.decrypt(encrypted, MASTER);
-                const decrypted = bytes.toString(CryptoJS.enc.Utf8);
-                
-                portalData = JSON.parse(decrypted);
+                portalData = JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
                 buildSidebar();
-            } catch(e) {
-                document.getElementById('main-sidebar').innerHTML = "<span style='color:red'>AUTH_ERROR: DATA_CORRUPT</span>";
-            }
+            } catch(e) { document.getElementById('main-sidebar').innerHTML = "<span style='color:red'>AUTH_ERROR</span>"; }
         }
 
         function buildSidebar() {
@@ -174,9 +157,7 @@
                     h += `<div class="batch-group"><div class="batch-title" onclick="toggle('b${si}${bi}')">${b.y}</div><div class="unit-content" id="b${si}${bi}">`;
                     b.u.forEach((u, ui) => {
                         h += `<div class="unit-title" onclick="toggle('u${si}${bi}${ui}')">${u.n}</div><div class="unit-content" id="u${si}${bi}${ui}">`;
-                        u.v.forEach(v => {
-                            h += `<div class="nav-link" id="nav-${v.i}" onclick="handleSwitch('${v.i}', this)">${v.t}</div>`;
-                        });
+                        u.v.forEach(v => { h += `<div class="nav-link" id="nav-${v.i}" onclick="handleSwitch('${v.i}', this)">${v.t}</div>`; });
                         h += `</div>`;
                     });
                     h += `</div></div>`;
@@ -198,9 +179,7 @@
 
         function updateRes(v) {
             currentTargetRes = v;
-            const now = player.getCurrentTime();
-            const id = player.getVideoData().video_id;
-            player.loadVideoById({'videoId': id, 'startSeconds': now, 'suggestedQuality': v});
+            player.loadVideoById({'videoId': player.getVideoData().video_id, 'startSeconds': player.getCurrentTime(), 'suggestedQuality': v});
         }
 
         function onYouTubeIframeAPIReady() {
@@ -210,15 +189,21 @@
                     clearInterval(w);
                     player = new YT.Player('player', {
                         playerVars: { 'controls': 0, 'modestbranding': 1, 'rel': 0, 'enablejsapi': 1, 'vq': currentTargetRes, 'autoplay': 0 },
-                        events: { 
-                            'onReady': (e) => { updateTitle(); },
-                            'onStateChange': (e) => { if (e.data == YT.PlayerState.PLAYING) { e.target.setPlaybackQuality(currentTargetRes); } updateTitle(); }
-                        }
+                        events: { 'onReady': updateTitle, 'onStateChange': (e) => { if (e.data == 1) e.target.setPlaybackQuality(currentTargetRes); updateTitle(); } }
                     });
                 }
             }, 100);
             setInterval(updateUI, 1000); 
         }
+
+        function resetHideTimer() {
+            wrapper.classList.remove('ui-hidden');
+            clearTimeout(hideTimeout);
+            if (document.fullscreenElement || document.webkitFullscreenElement) {
+                hideTimeout = setTimeout(() => { wrapper.classList.add('ui-hidden'); }, 3000);
+            }
+        }
+        wrapper.addEventListener('mousemove', resetHideTimer);
 
         function updateUI() { 
             if(player && player.getDuration) { 
@@ -231,15 +216,18 @@
         function formatTime(t) { var h=Math.floor(t/3600), m=Math.floor((t%3600)/60), s=Math.floor(t%60); return (h<10?'0'+h:h)+":"+(m<10?'0'+m:m)+":"+(s<10?'0'+s:s); }
         function updateTitle() { try { document.getElementById('current-video-title').innerText = player.getVideoData().title; } catch(e){} }
         function playPause() { (player.getPlayerState()==1)?player.pauseVideo():player.playVideo(); }
+        
         function goFullscreen() {
             if (!document.fullscreenElement && !document.webkitFullscreenElement) {
                 if (wrapper.requestFullscreen) wrapper.requestFullscreen();
                 else if (wrapper.webkitRequestFullscreen) wrapper.webkitRequestFullscreen();
-            } else { if (document.exitFullscreen) document.exitFullscreen(); }
+                resetHideTimer();
+            } else { if (document.exitFullscreen) document.exitFullscreen(); wrapper.classList.remove('ui-hidden'); }
         }
         function seek(e) { var r = e.currentTarget.getBoundingClientRect(); player.seekTo(player.getDuration()*((e.clientX-r.left)/r.width), true); }
         
         window.addEventListener('keydown', (e) => {
+            resetHideTimer();
             if (e.code === "Space") { e.preventDefault(); playPause(); }
             if (e.code === "KeyF") { e.preventDefault(); goFullscreen(); }
         });
