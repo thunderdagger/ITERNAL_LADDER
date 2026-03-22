@@ -6,6 +6,35 @@
     <<script src="sys-render-min.js"></script>
     
     <style>
+
+                /* SECURITY NOTIFICATION STYLES */
+        .security-banner {
+            background: #f0f7ff;
+            border: 1px solid #d0e3ff;
+            border-radius: 4px;
+            padding: 12px 15px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            max-width: 600px;
+        }
+        .warning-icon { font-size: 18px; margin-top: -2px; }
+        .banner-title { font-weight: bold; color: #1c1e21; font-size: 13px; margin-bottom: 5px; }
+        .banner-title span { color: #606770; font-weight: normal; }
+        .recommendation-tag {
+            display: inline-flex;
+            align-items: center;
+            background: #e7f3ff;
+            color: #1877f2;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+        .banner-text { color: #606770; line-height: 1.5; font-size: 11px; }
+        .link-style { color: #3b5998; text-decoration: none; font-weight: bold; border-bottom: 1px solid #3b5998; }
         
         body { background-color: #f7f7f7; color: #333; font-family: "lucida grande", tahoma, verdana, arial, sans-serif; margin: 0; padding: 0; font-size: 11px; overflow-x: hidden; }
         .header { background-color: #3b5998; padding: 8px 15px; color: white; border-bottom: 1px solid #29487d; display: flex; align-items: flex-end; justify-content: space-between; }
@@ -67,12 +96,26 @@
         <div class="sidebar" id="main-sidebar">Fetching,Please Wait...</div>
         
         <div id="welcome-portal">
-            <div class="welcome-box">
-                <h2>theeternalladder</h2>
-                <p>Knowledge Management System</p>
-                <hr style="border:0; border-top: 1px solid #eee; margin: 15px 0;">
-                <p style="color: #999;"><span class="status-dot"></span> Choose A Lesson From Sidebar</p>
+    <div class="welcome-box">
+        <div class="security-banner">
+            <div class="warning-icon">⚠️</div>
+            <div style="text-align: left;">
+                <div class="banner-title">Not so fast Mate ; <span>Do this first</span></div>
+                <div class="recommendation-tag">✓ Recommended: Use Firefox + uBlock Origin.</div>
+                <div class="banner-text">
+                    Firefox is the top non-Chromium browser, offering nice security and privacy features. 
+                    It also boasts the <span class="link-style">best compatibility</span> with uBlock Origin 
+                    for effectively blocking ads and other harmful web content.
+                </div>
             </div>
+        </div>
+
+        <h2>theeternalladder</h2>
+        <p>Knowledge Management System</p>
+        <hr style="border:0; border-top: 1px solid #eee; margin: 15px 0;">
+        <p style="color: #999;"><span class="status-dot"></span> Secure Connection Active (AES-256)</p>
+    </div>
+</div>
         </div>
 
         <div id="master-player-wrapper">
