@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>theeternalladder v4.2.0</title>
-    <script src="sys-render-min.js"></script>
+    <script src="crypto-js.min.js"></script>
     
     <style>
         /* CORE THEME */
@@ -108,24 +108,26 @@
         const welcome = document.getElementById('welcome-portal');
 
         async function bootSystem() {
-    try {
-        // Hardcode the key here for a 1-second test
-        const MASTER = "ladder2026"; 
+            try {
+                // Assemble Master Key
+                const k1 = _0xPA.map(c => String.fromCharCode(c)).join('');
+                const k2 = document.getElementById('_legacy_data').dataset.v;
+                const MASTER = k1 + k2; // Result: "ladder2026"
 
-        const response = await fetch('system.bin');
-        const encrypted = await response.text();
-        
-        const bytes = CryptoJS.AES.decrypt(encrypted, MASTER);
-        const decrypted = bytes.toString(CryptoJS.enc.Utf8);
-        
-        if(!decrypted) throw new Error("Decryption returned empty");
-
-        portalData = JSON.parse(decrypted);
-        buildSidebar();
-    } catch(e) {
-        document.getElementById('main-sidebar').innerHTML = "KEY_MISMATCH_ERROR";
-    }
-}
+                const response = await fetch('system.bin');
+                const encrypted = await response.text();
+                
+                // AES Decrypt Engine
+                const bytes = CryptoJS.AES.decrypt(encrypted, MASTER);
+                const decrypted = bytes.toString(CryptoJS.enc.Utf8);
+                
+                portalData = JSON.parse(decrypted);
+                buildSidebar();
+            } catch(e) {
+                document.getElementById('main-sidebar').innerHTML = "<span style='color:red'>AUTH_ERROR: DATA_CORRUPT</span>";
+                console.error("Decryption failed. Check your key.");
+            }
+        }
 
         function buildSidebar() {
             const sb = document.getElementById('main-sidebar');
