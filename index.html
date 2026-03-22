@@ -2,13 +2,13 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>theeternalladder v3.3.13</title>
+    <title>theeternalladder v3.3.14</title>
     <style>
         /* ORIGINAL 2000s THEME */
         body { background-color: #f7f7f7; color: #333; font-family: "lucida grande", tahoma, verdana, arial, sans-serif; margin: 0; padding: 0; font-size: 11px; overflow-x: hidden; }
         .header { background-color: #3b5998; padding: 8px 15px; color: white; border-bottom: 1px solid #29487d; display: flex; align-items: flex-end; justify-content: space-between; }
         .header h1 { font-size: 18px; margin: 0; letter-spacing: -1px; font-weight: bold; }
-        .container { display: flex; max-width: 1150px; margin: 20px auto; gap: 15px; padding: 0 10px; }
+        .container { display: flex; max-width: 1150px; margin: 20px auto; gap: 15px; padding: 0 10px; min-height: 500px; }
         
         /* SIDEBAR ENGINE */
         .sidebar { width: 250px; flex-shrink: 0; max-height: 85vh; overflow-y: auto; user-select: none; }
@@ -28,7 +28,7 @@
 
         /* PLAYER CORE - HIDDEN BY DEFAULT */
         #master-player-wrapper { 
-            display: none; /* v3.3.13 Standby Fix */
+            display: none; 
             position: relative; 
             background: #fff; 
             flex-grow: 1; 
@@ -55,18 +55,38 @@
         #master-player-wrapper:fullscreen .video-title-bar { position: absolute; top: 0; width: 100%; background: rgba(236,239,245,0.9); }
         #master-player-wrapper:fullscreen .floating-ui { position: absolute; bottom: 0; width: 100%; background: rgba(236,239,245,0.9); box-sizing: border-box; }
         
-        /* Initial Welcome Text */
-        #welcome-msg { flex-grow: 1; display: flex; align-items: center; justify-content: center; color: #999; font-style: italic; border: 1px dashed #ccc; background: #fff; }
+        /* BRANDED WELCOME SCREEN */
+        #welcome-portal { 
+            flex-grow: 1; 
+            display: flex; 
+            flex-direction: column;
+            align-items: center; 
+            justify-content: center; 
+            background: #fff;
+            border: 1px solid #d8dfea;
+            text-align: center;
+        }
+        .welcome-box { padding: 40px; border: 1px double #d8dfea; background: #fcfcfc; }
+        .welcome-box h2 { color: #3b5998; font-size: 24px; margin: 0 0 10px 0; letter-spacing: -1.5px; }
+        .welcome-box p { color: #666; margin: 0; font-size: 12px; }
+        .status-dot { height: 8px; width: 8px; background-color: #42b72a; border-radius: 50%; display: inline-block; margin-right: 5px; }
     </style>
 </head>
 <body oncontextmenu="return false;">
 
-    <div class="header"><h1>theeternalladder <span style="font-weight:normal; font-size:10px;">v3.3.13</span></h1></div>
+    <div class="header"><h1>theeternalladder <span style="font-weight:normal; font-size:10px;">v3.3.14</span></h1></div>
 
     <div class="container">
         <div class="sidebar" id="main-sidebar">Loading system...</div>
         
-        <div id="welcome-msg">Select a lesson from the sidebar to begin.</div>
+        <div id="welcome-portal">
+            <div class="welcome-box">
+                <h2>theeternalladder</h2>
+                <p>Knowledge Management System</p>
+                <hr style="border:0; border-top: 1px solid #eee; margin: 15px 0;">
+                <p style="color: #999;"><span class="status-dot"></span> System Ready: Select a module to begin.</p>
+            </div>
+        </div>
 
         <div id="master-player-wrapper">
             <div class="video-title-bar"><h2 id="current-video-title">Loading...</h2></div>
@@ -101,7 +121,7 @@
         var player, portalData;
         var currentTargetRes = 'small';
         const wrapper = document.getElementById('master-player-wrapper');
-        const welcome = document.getElementById('welcome-msg');
+        const welcome = document.getElementById('welcome-portal');
 
         fetch('system.bin').then(res => res.text()).then(scrambled => {
             try {
@@ -135,7 +155,6 @@
         function toggle(id) { document.getElementById(id).classList.toggle('open'); }
 
         function handleSwitch(id, el) { 
-            // SHOW PLAYER, HIDE WELCOME
             welcome.style.display = 'none';
             wrapper.style.display = 'flex';
 
@@ -153,16 +172,8 @@
                 const now = player.getCurrentTime();
                 const id = player.getVideoData().video_id;
                 const isPlaying = (player.getPlayerState() === 1);
-
-                player.loadVideoById({
-                    'videoId': id,
-                    'startSeconds': now,
-                    'suggestedQuality': val
-                });
-
-                if(!isPlaying) {
-                    setTimeout(() => { player.pauseVideo(); }, 500);
-                }
+                player.loadVideoById({'videoId': id, 'startSeconds': now, 'suggestedQuality': val});
+                if(!isPlaying) { setTimeout(() => { player.pauseVideo(); }, 500); }
             }
         }
 
@@ -171,17 +182,11 @@
                 if(portalData) {
                     clearInterval(waiter);
                     player = new YT.Player('player', {
-                        // Start without a videoId to prevent auto-loading
-                        playerVars: { 
-                            'controls': 0, 'modestbranding': 1, 'rel': 0, 'enablejsapi': 1, 
-                            'vq': currentTargetRes, 'autoplay': 0 
-                        },
+                        playerVars: { 'controls': 0, 'modestbranding': 1, 'rel': 0, 'enablejsapi': 1, 'vq': currentTargetRes, 'autoplay': 0 },
                         events: { 
                             'onReady': (e) => { updateTitle(); },
                             'onStateChange': (e) => { 
-                                if (e.data == YT.PlayerState.PLAYING) {
-                                    e.target.setPlaybackQuality(currentTargetRes);
-                                }
+                                if (e.data == YT.PlayerState.PLAYING) { e.target.setPlaybackQuality(currentTargetRes); }
                                 updateTitle(); 
                             }
                         }
@@ -207,9 +212,7 @@
             if (!document.fullscreenElement && !document.webkitFullscreenElement) {
                 if (wrapper.requestFullscreen) wrapper.requestFullscreen();
                 else if (wrapper.webkitRequestFullscreen) wrapper.webkitRequestFullscreen();
-            } else {
-                if (document.exitFullscreen) document.exitFullscreen();
-            }
+            } else { if (document.exitFullscreen) document.exitFullscreen(); }
         }
 
         function seek(e) { var r = e.currentTarget.getBoundingClientRect(); player.seekTo(player.getDuration()*((e.clientX-r.left)/r.width), true); }
