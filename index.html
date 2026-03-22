@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>theeternalladder v3.3.10</title>
+    <title>theeternalladder v3.3.11</title>
     <style>
         /* ORIGINAL 2000s THEME */
         body { background-color: #f7f7f7; color: #333; font-family: "lucida grande", tahoma, verdana, arial, sans-serif; margin: 0; padding: 0; font-size: 11px; overflow-x: hidden; }
@@ -25,7 +25,7 @@
         .nav-link:hover { background-color: #eff2f7; text-decoration: underline; }
         .nav-link.active { background-color: #3b5998; color: white !important; font-weight: bold; border-left: 2px solid #29487d; }
 
-        #master-player-wrapper { position: relative; background: #fff; flex-grow: 1; border: 1px solid #d8dfea; display: flex; flex-direction: column; outline: none; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        #master-player-wrapper { position: relative; background: #fff; flex-grow: 1; border: 1px solid #d8dfea; display: flex; flex-direction: column; outline: none; overflow: hidden; }
         .video-title-bar { background: #eceff5; border-bottom: 1px solid #d8dfea; padding: 10px 12px; z-index: 100; }
         .video-title-bar h2 { margin: 0; font-size: 13px; color: #3b5998; font-weight: bold; }
         .video-engine { position: relative; width: 100%; aspect-ratio: 16/9; background: #000; z-index: 1; }
@@ -36,7 +36,6 @@
         .timeline-container { flex-grow: 1; background: #ccc; height: 10px; cursor: pointer; border: 1px solid #999; position: relative; overflow: hidden; margin-bottom: 8px; }
         .progress-bar { position: absolute; background: #3b5998; height: 100%; width: 0%; z-index: 2; }
         .fb-button { background: #3b5998; color: white; border: 1px solid #29487d; padding: 4px 10px; font-size: 10px; font-weight: bold; cursor: pointer; }
-        .fb-button:hover { background: #2d4373; }
         .res-sel { background: #fff; color: #3b5998; border: 1px solid #3b5998; padding: 3px; font-size: 10px; font-weight: bold; cursor: pointer; }
 
         #master-player-wrapper:fullscreen .video-title-bar { position: absolute; top: 0; width: 100%; background: rgba(236,239,245,0.9); }
@@ -45,7 +44,7 @@
 </head>
 <body oncontextmenu="return false;">
 
-    <div class="header"><h1>theeternalladder <span style="font-weight:normal; font-size:10px;">v3.3.10</span></h1></div>
+    <div class="header"><h1>theeternalladder <span style="font-weight:normal; font-size:10px;">v3.3.11</span></h1></div>
 
     <div class="container">
         <div class="sidebar" id="main-sidebar">Loading system...</div>
@@ -65,7 +64,7 @@
                     <button class="fb-button" onclick="playPause()">PLAY / PAUSE</button>
                     
                     <select id="res-selector" class="res-sel" onchange="updateResolution(this.value)">
-                        <option value="small">360p</option>
+                        <option value="small" selected>360p</option>
                         <option value="medium">480p</option>
                         <option value="hd720">720p</option>
                         <option value="hd1080">1080p</option>
@@ -81,8 +80,7 @@
     <script src="https://www.youtube.com/iframe_api"></script>
     <script>
         var player, portalData;
-        var targetRes = 'small'; 
-        var userInteracted = false; // THE FIX: Autoplay preventer
+        var currentTargetRes = 'small';
         const wrapper = document.getElementById('master-player-wrapper');
 
         fetch('system.bin').then(res => res.text()).then(scrambled => {
@@ -90,7 +88,7 @@
                 const decoded = decodeURIComponent(escape(atob(scrambled)));
                 portalData = JSON.parse(decoded);
                 buildSidebar();
-            } catch(e) { console.error("Data decode error."); }
+            } catch(e) { console.error("Decode error."); }
         });
 
         function buildSidebar() {
@@ -117,15 +115,16 @@
         function toggle(id) { document.getElementById(id).classList.toggle('open'); }
 
         function handleSwitch(id, el) { 
-            userInteracted = true; // Link click counts as interaction
-            player.loadVideoById({'videoId': id, 'suggestedQuality': targetRes});
+            player.loadVideoById({'videoId': id, 'suggestedQuality': currentTargetRes});
             document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
             el.classList.add('active');
         }
 
         function updateResolution(val) {
-            targetRes = val;
-            if(userInteracted) forceQuality(player);
+            currentTargetRes = val;
+            if(player && player.setPlaybackQuality) {
+                player.setPlaybackQuality(val);
+            }
         }
 
         function onYouTubeIframeAPIReady() {
@@ -134,13 +133,18 @@
                     clearInterval(waiter);
                     player = new YT.Player('player', {
                         videoId: portalData[0].b[0].u[0].v[0].i,
-                        playerVars: { 'controls': 0, 'modestbranding': 1, 'rel': 0, 'enablejsapi': 1, 'vq': targetRes, 'autoplay': 0 },
+                        playerVars: { 
+                            'controls': 0, 'modestbranding': 1, 'rel': 0, 'enablejsapi': 1, 
+                            'vq': currentTargetRes, 'autoplay': 0 
+                        },
                         events: { 
-                            'onReady': (e) => { updateTitle(); }, // Don't force quality on load
+                            'onReady': (e) => { 
+                                e.target.setPlaybackQuality(currentTargetRes);
+                                updateTitle(); 
+                            },
                             'onStateChange': (e) => { 
-                                if (e.data == YT.PlayerState.PLAYING) { 
-                                    userInteracted = true;
-                                    forceQuality(e.target); 
+                                if (e.data == YT.PlayerState.PLAYING) {
+                                    e.target.setPlaybackQuality(currentTargetRes);
                                 }
                                 updateTitle(); 
                             }
@@ -148,29 +152,7 @@
                     });
                 }
             }, 100);
-
-            // QUALITY MONITOR: Only runs if the user has actually started the video
-            setInterval(() => {
-                if(userInteracted && player && player.getPlaybackQuality) {
-                    let q = player.getPlaybackQuality();
-                    if(q !== targetRes && q !== 'unknown') {
-                        forceQuality(player);
-                    }
-                }
-            }, 4000); // Polling eased to 4s for stability
-
             setInterval(updateUI, 1000); 
-        }
-
-        function forceQuality(p) {
-            if(!p || !p.setPlaybackQuality || !userInteracted) return;
-            p.setPlaybackQuality(targetRes);
-            // Only re-sync if strictly necessary to avoid the "black flash" glitch
-            if(p.getPlaybackQuality() !== targetRes && p.getPlayerState() === 1) {
-                const now = p.getCurrentTime();
-                const id = p.getVideoData().video_id;
-                p.loadVideoById({'videoId': id, 'startSeconds': now, 'suggestedQuality': targetRes});
-            }
         }
 
         function updateUI() { 
@@ -183,13 +165,9 @@
 
         function formatTime(t) { var h=Math.floor(t/3600), m=Math.floor((t%3600)/60), s=Math.floor(t%60); return (h<10?'0'+h:h)+":"+(m<10?'0'+m:m)+":"+(s<10?'0'+s:s); }
         function updateTitle() { try { document.getElementById('current-video-title').innerText = player.getVideoData().title; } catch(e){} }
-        function playPause() { 
-            userInteracted = true;
-            (player.getPlayerState()==1)?player.pauseVideo():player.playVideo(); 
-        }
+        function playPause() { (player.getPlayerState()==1)?player.pauseVideo():player.playVideo(); }
 
         function goFullscreen() {
-            userInteracted = true;
             if (!document.fullscreenElement && !document.webkitFullscreenElement) {
                 if (wrapper.requestFullscreen) wrapper.requestFullscreen();
                 else if (wrapper.webkitRequestFullscreen) wrapper.webkitRequestFullscreen();
