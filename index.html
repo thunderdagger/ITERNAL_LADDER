@@ -2,46 +2,17 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>theeternalladder v4.2.0</title>
-    <<script src="sys-render-min.js"></script>
+    <title>theeternalladder v4.2.1</title>
+    <script src="sys-render-min.js"></script>
     
     <style>
-
-                /* SECURITY NOTIFICATION STYLES */
-        .security-banner {
-            background: #f0f7ff;
-            border: 1px solid #d0e3ff;
-            border-radius: 4px;
-            padding: 12px 15px;
-            margin-bottom: 20px;
-            display: flex;
-            align-items: flex-start;
-            gap: 12px;
-            max-width: 600px;
-        }
-        .warning-icon { font-size: 18px; margin-top: -2px; }
-        .banner-title { font-weight: bold; color: #1c1e21; font-size: 13px; margin-bottom: 5px; }
-        .banner-title span { color: #606770; font-weight: normal; }
-        .recommendation-tag {
-            display: inline-flex;
-            align-items: center;
-            background: #e7f3ff;
-            color: #1877f2;
-            padding: 2px 8px;
-            border-radius: 4px;
-            font-size: 11px;
-            font-weight: bold;
-            margin-bottom: 8px;
-        }
-        .banner-text { color: #606770; line-height: 1.5; font-size: 11px; }
-        .link-style { color: #3b5998; text-decoration: none; font-weight: bold; border-bottom: 1px solid #3b5998; }
-        
+        /* CORE THEME */
         body { background-color: #f7f7f7; color: #333; font-family: "lucida grande", tahoma, verdana, arial, sans-serif; margin: 0; padding: 0; font-size: 11px; overflow-x: hidden; }
         .header { background-color: #3b5998; padding: 8px 15px; color: white; border-bottom: 1px solid #29487d; display: flex; align-items: flex-end; justify-content: space-between; }
         .header h1 { font-size: 18px; margin: 0; letter-spacing: -1px; font-weight: bold; }
         .container { display: flex; max-width: 1150px; margin: 20px auto; gap: 15px; padding: 0 10px; min-height: 550px; }
         
-        
+        /* SIDEBAR ENGINE */
         .sidebar { width: 250px; flex-shrink: 0; max-height: 85vh; overflow-y: auto; user-select: none; }
         .side-box { background: white; border: 1px solid #d8dfea; margin-bottom: 5px; border-radius: 2px; overflow: hidden; }
         .subject-header { background: #eceff5; padding: 10px; color: #3b5998; font-weight: bold; border-bottom: 1px solid #d8dfea; font-size: 12px; cursor: pointer; display: flex; justify-content: space-between; }
@@ -56,7 +27,7 @@
         .nav-link:hover { background-color: #eff2f7; text-decoration: underline; }
         .nav-link.active { background-color: #3b5998; color: white !important; font-weight: bold; border-left: 2px solid #29487d; }
 
-        
+        /* PLAYER WRAPPER */
         #master-player-wrapper { display: none; position: relative; background: #fff; flex-grow: 1; border: 1px solid #d8dfea; flex-direction: column; outline: none; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
         .video-title-bar { background: #eceff5; border-bottom: 1px solid #d8dfea; padding: 10px 12px; z-index: 100; transition: transform 0.4s, opacity 0.4s; }
         .video-title-bar h2 { margin: 0; font-size: 13px; color: #3b5998; font-weight: bold; }
@@ -70,52 +41,62 @@
         .fb-button { background: #3b5998; color: white; border: 1px solid #29487d; padding: 4px 10px; font-size: 10px; font-weight: bold; cursor: pointer; }
         .res-sel { background: #fff; color: #3b5998; border: 1px solid #3b5998; padding: 3px; font-size: 10px; font-weight: bold; cursor: pointer; }
 
+        /* WELCOME PORTAL & BRANDING */
+        #welcome-portal { flex-grow: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #fff; border: 1px solid #d8dfea; text-align: center; min-height: 500px;}
+        .welcome-box { padding: 40px; border: 1px solid #e9ebee; background: #ffffff; max-width: 700px; width: 90%; }
         
-        #master-player-wrapper:fullscreen .video-title-bar, 
-        #master-player-wrapper:fullscreen .floating-ui { position: absolute; width: 100%; background: rgba(236,239,245,0.9); box-sizing: border-box; }
-        #master-player-wrapper:fullscreen .video-title-bar { top: 0; }
-        #master-player-wrapper:fullscreen .floating-ui { bottom: 0; }
-        #master-player-wrapper.ui-hidden { cursor: none; }
-        #master-player-wrapper.ui-hidden .video-title-bar { transform: translateY(-100%); opacity: 0; }
-        #master-player-wrapper.ui-hidden .floating-ui { transform: translateY(100%); opacity: 0; }
+        .alert-banner { background: #f0f7ff; border: 1px solid #d0e3ff; border-radius: 4px; padding: 15px; margin-bottom: 30px; display: flex; align-items: flex-start; gap: 15px; text-align: left; }
+        .alert-icon { font-size: 20px; }
+        .alert-title { font-weight: bold; color: #1c1e21; font-size: 14px; margin-bottom: 4px; }
+        .alert-title span { color: #606770; font-weight: normal; }
+        .alert-tag { background: #ffffff; border: 1px solid #d0e3ff; color: #1877f2; padding: 3px 8px; border-radius: 4px; font-size: 11px; font-weight: bold; display: inline-block; margin-bottom: 10px; }
+        .alert-body { color: #606770; line-height: 1.6; font-size: 12px; }
+        .alert-link { color: #3b5998; text-decoration: none; font-weight: bold; border-bottom: 1px solid #3b5998; }
 
-       
-        #welcome-portal { flex-grow: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #fff; border: 1px solid #d8dfea; text-align: center; }
-        .welcome-box { padding: 40px; border: 1px double #d8dfea; background: #fcfcfc; }
-        .welcome-box h2 { color: #3b5998; font-size: 24px; margin: 0 0 10px 0; letter-spacing: -1.5px; }
-        .status-dot { height: 8px; width: 8px; background-color: #42b72a; border-radius: 50%; display: inline-block; margin-right: 5px; }
+        .brand-title { color: #3b5998; font-size: 32px; margin: 0; letter-spacing: -2px; font-weight: bold; }
+        .brand-sub { color: #606770; font-size: 14px; margin: 5px 0 20px 0; }
+        .status-line { border-top: 1px solid #e9ebee; padding-top: 20px; color: #999; display: flex; align-items: center; justify-content: center; gap: 8px; }
+        .status-dot { height: 10px; width: 10px; background-color: #42b72a; border-radius: 50%; display: inline-block; }
+
+        /* FOOTER */
+        .site-footer { background: #1c1e21; color: #8d949e; padding: 40px 20px; text-align: center; border-top: 4px solid #3b5998; margin-top: 40px; }
+        .footer-desc { max-width: 800px; margin: 0 auto 15px; line-height: 1.6; font-size: 12px; }
+        .footer-desc b { color: #fff; }
+        .footer-legal { color: #ffb400; font-weight: bold; margin-bottom: 20px; font-size: 12px; }
+        .footer-copy { font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: #606770; }
     </style>
 </head>
 <body oncontextmenu="return false;">
 
     <div id="_legacy_data" data-v="2026" style="display:none;"></div>
 
-    <div class="header"><h1>theeternalladder <span style="font-weight:normal; font-size:10px;">v4.2.0</span></h1></div>
+    <div class="header"><h1>theeternalladder <span style="font-weight:normal; font-size:10px;">v4.2.1</span></h1></div>
 
     <div class="container">
-        <div class="sidebar" id="main-sidebar">Fetching,Please Wait...</div>
+        <div class="sidebar" id="main-sidebar">Initializing Cryptography...</div>
         
         <div id="welcome-portal">
-    <div class="welcome-box">
-        <div class="security-banner">
-            <div class="warning-icon">⚠️</div>
-            <div style="text-align: left;">
-                <div class="banner-title">Not so fast Mate ; <span>Do this first</span></div>
-                <div class="recommendation-tag">✓ Recommended: Use Firefox + uBlock Origin.</div>
-                <div class="banner-text">
-                    Firefox is the top non-Chromium browser, offering nice security and privacy features. 
-                    It also boasts the <span class="link-style">best compatibility</span> with uBlock Origin 
-                    for effectively blocking ads and other harmful web content.
+            <div class="welcome-box">
+                <div class="alert-banner">
+                    <div class="alert-icon">⚠️</div>
+                    <div>
+                        <div class="alert-title">Not so fast Mate ; <span>Do this first</span></div>
+                        <div class="alert-tag">✓ Recommended: Use Firefox + uBlock Origin.</div>
+                        <div class="alert-body">
+                            Firefox is the top non-Chromium browser, offering nice security and privacy features. 
+                            It also boasts the <span class="alert-link">best compatibility</span> with uBlock Origin for effectively blocking ads and other harmful web content.
+                        </div>
+                    </div>
+                </div>
+
+                <h2 class="brand-title">theeternalladder</h2>
+                <p class="brand-sub">Knowledge Management System</p>
+                
+                <div class="status-line">
+                    <span class="status-dot"></span> 
+                    <span>Select Lessons From The SideBar</span>
                 </div>
             </div>
-        </div>
-
-        <h2>theeternalladder</h2>
-        <p>Knowledge Management System</p>
-        <hr style="border:0; border-top: 1px solid #eee; margin: 15px 0;">
-        <p style="color: #999;"><span class="status-dot"></span> Select Lessons From The SideBar</p>
-    </div>
-</div>
         </div>
 
         <div id="master-player-wrapper">
@@ -140,9 +121,21 @@
         </div>
     </div>
 
+    <footer class="site-footer">
+        <div class="footer-desc">
+            <b>eternalladdder</b> is a streaming website, where to watch lessons online without registration required. 
+            With a big database and great features, we're confident this is the best educational space that you can't simply miss!
+        </div>
+        <div class="footer-legal">
+            This site does not store any files on our server, we only linked to the media which is hosted on 3rd party services.
+        </div>
+        <div class="footer-copy">
+            &copy; <span id="copyright-year">2026</span> eternalladdder. All Rights Reserved
+        </div>
+    </footer>
+
     <script src="https://www.youtube.com/iframe_api"></script>
     <script>
-        
         const _0xPA = [108, 97, 100, 100, 101, 114];
         var player, portalData, hideTimeout;
         var currentTargetRes = 'hd720';
@@ -150,16 +143,17 @@
         const wrapper = document.getElementById('master-player-wrapper');
         const welcome = document.getElementById('welcome-portal');
 
+        // Auto-update Footer Year
+        document.getElementById('copyright-year').innerText = new Date().getFullYear();
+
         async function bootSystem() {
             try {
-                
                 const k1 = _0xPA.map(c => String.fromCharCode(c)).join('');
                 const k2 = document.getElementById('_legacy_data').dataset.v;
                 const MASTER = k1 + k2; 
 
                 const response = await fetch('system.bin');
                 const encrypted = await response.text();
-                
                 
                 const bytes = CryptoJS.AES.decrypt(encrypted, MASTER);
                 const decrypted = bytes.toString(CryptoJS.enc.Utf8);
@@ -168,7 +162,6 @@
                 buildSidebar();
             } catch(e) {
                 document.getElementById('main-sidebar').innerHTML = "<span style='color:red'>AUTH_ERROR: DATA_CORRUPT</span>";
-                console.error("Decryption failed. Check your key.");
             }
         }
 
@@ -227,15 +220,6 @@
             setInterval(updateUI, 1000); 
         }
 
-        function resetHideTimer() {
-            wrapper.classList.remove('ui-hidden');
-            clearTimeout(hideTimeout);
-            if (document.fullscreenElement || document.webkitFullscreenElement) {
-                hideTimeout = setTimeout(() => { wrapper.classList.add('ui-hidden'); }, 3000);
-            }
-        }
-        wrapper.addEventListener('mousemove', resetHideTimer);
-
         function updateUI() { 
             if(player && player.getDuration) { 
                 var c = player.getCurrentTime(), d = player.getDuration();
@@ -256,7 +240,6 @@
         function seek(e) { var r = e.currentTarget.getBoundingClientRect(); player.seekTo(player.getDuration()*((e.clientX-r.left)/r.width), true); }
         
         window.addEventListener('keydown', (e) => {
-            resetHideTimer();
             if (e.code === "Space") { e.preventDefault(); playPause(); }
             if (e.code === "KeyF") { e.preventDefault(); goFullscreen(); }
         });
