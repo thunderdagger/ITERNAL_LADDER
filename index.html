@@ -6,13 +6,13 @@
     <<script src="sys-render-min.js"></script>
     
     <style>
-        /* CORE THEME */
+        
         body { background-color: #f7f7f7; color: #333; font-family: "lucida grande", tahoma, verdana, arial, sans-serif; margin: 0; padding: 0; font-size: 11px; overflow-x: hidden; }
         .header { background-color: #3b5998; padding: 8px 15px; color: white; border-bottom: 1px solid #29487d; display: flex; align-items: flex-end; justify-content: space-between; }
         .header h1 { font-size: 18px; margin: 0; letter-spacing: -1px; font-weight: bold; }
         .container { display: flex; max-width: 1150px; margin: 20px auto; gap: 15px; padding: 0 10px; min-height: 550px; }
         
-        /* SIDEBAR ENGINE */
+        
         .sidebar { width: 250px; flex-shrink: 0; max-height: 85vh; overflow-y: auto; user-select: none; }
         .side-box { background: white; border: 1px solid #d8dfea; margin-bottom: 5px; border-radius: 2px; overflow: hidden; }
         .subject-header { background: #eceff5; padding: 10px; color: #3b5998; font-weight: bold; border-bottom: 1px solid #d8dfea; font-size: 12px; cursor: pointer; display: flex; justify-content: space-between; }
@@ -27,7 +27,7 @@
         .nav-link:hover { background-color: #eff2f7; text-decoration: underline; }
         .nav-link.active { background-color: #3b5998; color: white !important; font-weight: bold; border-left: 2px solid #29487d; }
 
-        /* PLAYER WRAPPER */
+        
         #master-player-wrapper { display: none; position: relative; background: #fff; flex-grow: 1; border: 1px solid #d8dfea; flex-direction: column; outline: none; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
         .video-title-bar { background: #eceff5; border-bottom: 1px solid #d8dfea; padding: 10px 12px; z-index: 100; transition: transform 0.4s, opacity 0.4s; }
         .video-title-bar h2 { margin: 0; font-size: 13px; color: #3b5998; font-weight: bold; }
@@ -41,7 +41,7 @@
         .fb-button { background: #3b5998; color: white; border: 1px solid #29487d; padding: 4px 10px; font-size: 10px; font-weight: bold; cursor: pointer; }
         .res-sel { background: #fff; color: #3b5998; border: 1px solid #3b5998; padding: 3px; font-size: 10px; font-weight: bold; cursor: pointer; }
 
-        /* STEALTH FULLSCREEN */
+        
         #master-player-wrapper:fullscreen .video-title-bar, 
         #master-player-wrapper:fullscreen .floating-ui { position: absolute; width: 100%; background: rgba(236,239,245,0.9); box-sizing: border-box; }
         #master-player-wrapper:fullscreen .video-title-bar { top: 0; }
@@ -50,7 +50,7 @@
         #master-player-wrapper.ui-hidden .video-title-bar { transform: translateY(-100%); opacity: 0; }
         #master-player-wrapper.ui-hidden .floating-ui { transform: translateY(100%); opacity: 0; }
 
-        /* WELCOME PORTAL */
+       
         #welcome-portal { flex-grow: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #fff; border: 1px solid #d8dfea; text-align: center; }
         .welcome-box { padding: 40px; border: 1px double #d8dfea; background: #fcfcfc; }
         .welcome-box h2 { color: #3b5998; font-size: 24px; margin: 0 0 10px 0; letter-spacing: -1.5px; }
@@ -64,14 +64,14 @@
     <div class="header"><h1>theeternalladder <span style="font-weight:normal; font-size:10px;">v4.2.0</span></h1></div>
 
     <div class="container">
-        <div class="sidebar" id="main-sidebar">Initializing Cryptography...</div>
+        <div class="sidebar" id="main-sidebar">Fetching,Please Wait...</div>
         
         <div id="welcome-portal">
             <div class="welcome-box">
                 <h2>theeternalladder</h2>
                 <p>Knowledge Management System</p>
                 <hr style="border:0; border-top: 1px solid #eee; margin: 15px 0;">
-                <p style="color: #999;"><span class="status-dot"></span> Secure Connection Active</p>
+                <p style="color: #999;"><span class="status-dot"></span> Choose A Lesson From Sidebar</p>
             </div>
         </div>
 
@@ -99,7 +99,7 @@
 
     <script src="https://www.youtube.com/iframe_api"></script>
     <script>
-        // HORCRUX PART A: SHREDDED KEY [l,a,d,d,e,r]
+        
         const _0xPA = [108, 97, 100, 100, 101, 114];
         var player, portalData, hideTimeout;
         var currentTargetRes = 'hd720';
@@ -109,15 +109,15 @@
 
         async function bootSystem() {
             try {
-                // Assemble Master Key
+                
                 const k1 = _0xPA.map(c => String.fromCharCode(c)).join('');
                 const k2 = document.getElementById('_legacy_data').dataset.v;
-                const MASTER = k1 + k2; // Result: "ladder2026"
+                const MASTER = k1 + k2; 
 
                 const response = await fetch('system.bin');
                 const encrypted = await response.text();
                 
-                // AES Decrypt Engine
+                
                 const bytes = CryptoJS.AES.decrypt(encrypted, MASTER);
                 const decrypted = bytes.toString(CryptoJS.enc.Utf8);
                 
