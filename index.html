@@ -2,9 +2,9 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>theeternalladder v3.3.6</title>
+    <title>theeternalladder v3.3.9</title>
     <style>
-        /* ORIGINAL 2000s THEME - NO CHANGES */
+        /* ORIGINAL 2000s THEME */
         body { background-color: #f7f7f7; color: #333; font-family: "lucida grande", tahoma, verdana, arial, sans-serif; margin: 0; padding: 0; font-size: 11px; overflow-x: hidden; }
         .header { background-color: #3b5998; padding: 8px 15px; color: white; border-bottom: 1px solid #29487d; display: flex; align-items: flex-end; justify-content: space-between; }
         .header h1 { font-size: 18px; margin: 0; letter-spacing: -1px; font-weight: bold; }
@@ -15,17 +15,13 @@
         .side-box { background: white; border: 1px solid #d8dfea; margin-bottom: 5px; border-radius: 2px; overflow: hidden; }
         .subject-header { background: #eceff5; padding: 10px; color: #3b5998; font-weight: bold; border-bottom: 1px solid #d8dfea; font-size: 12px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
         .subject-header:hover { background: #dbe2ef; }
-        
         .batch-content { display: none; background: #fff; }
         .batch-content.open { display: block; }
         .batch-group { border-bottom: 1px solid #f0f0f0; }
         .batch-title { padding: 8px 10px; font-weight: bold; color: #666; font-size: 10px; text-transform: uppercase; cursor: pointer; background: #fafafa; }
-        .batch-title:hover { background: #f0f2f5; color: #3b5998; }
-
         .unit-content { display: none; padding-bottom: 5px; }
         .unit-content.open { display: block; }
         .unit-title { padding: 5px 20px; color: #3b5998; font-style: italic; font-weight: bold; font-size: 10px; cursor: pointer; border-left: 3px solid #d8dfea; }
-
         .nav-link { display: block; color: #3b5998; text-decoration: none; padding: 4px 5px 4px 35px; cursor: pointer; border-left: 2px solid transparent; }
         .nav-link:hover { background-color: #eff2f7; text-decoration: underline; }
         .nav-link.active { background-color: #3b5998; color: white !important; font-weight: bold; border-left: 2px solid #29487d; }
@@ -35,23 +31,26 @@
         .video-title-bar { background: #eceff5; border-bottom: 1px solid #d8dfea; padding: 10px 12px; z-index: 100; }
         .video-title-bar h2 { margin: 0; font-size: 13px; color: #3b5998; font-weight: bold; }
         .video-engine { position: relative; width: 100%; aspect-ratio: 16/9; background: #000; z-index: 1; }
-        
         #player { position: absolute; top: -55px; left: 0; width: 100%; height: calc(100% + 110px); pointer-events: none; }
         .shield { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 50; cursor: pointer; }
         
+        /* UI OVERLAY */
         .floating-ui { background: #eceff5; border-top: 1px solid #3b5998; padding: 10px; z-index: 100; }
         .timeline-container { flex-grow: 1; background: #ccc; height: 10px; cursor: pointer; border: 1px solid #999; position: relative; overflow: hidden; margin-bottom: 8px; }
         .progress-bar { position: absolute; background: #3b5998; height: 100%; width: 0%; z-index: 2; }
         .fb-button { background: #3b5998; color: white; border: 1px solid #29487d; padding: 4px 10px; font-size: 10px; font-weight: bold; cursor: pointer; }
         .fb-button:hover { background: #2d4373; }
         
+        /* RESOLUTION SELECTOR STYLE */
+        .res-sel { background: #fff; color: #3b5998; border: 1px solid #3b5998; padding: 3px; font-size: 10px; font-weight: bold; cursor: pointer; }
+
         #master-player-wrapper:fullscreen .video-title-bar { position: absolute; top: 0; width: 100%; background: rgba(236,239,245,0.9); }
         #master-player-wrapper:fullscreen .floating-ui { position: absolute; bottom: 0; width: 100%; background: rgba(236,239,245,0.9); box-sizing: border-box; }
     </style>
 </head>
 <body oncontextmenu="return false;">
 
-    <div class="header"><h1>theeternalladder <span style="font-weight:normal; font-size:10px;">v3.3.6</span></h1></div>
+    <div class="header"><h1>theeternalladder <span style="font-weight:normal; font-size:10px;">v3.3.9</span></h1></div>
 
     <div class="container">
         <div class="sidebar" id="main-sidebar">Loading system...</div>
@@ -69,6 +68,14 @@
                 </div>
                 <div style="display:flex; align-items:center; gap:12px;">
                     <button class="fb-button" onclick="playPause()">PLAY / PAUSE</button>
+                    
+                    <select id="res-selector" class="res-sel" onchange="updateResolution(this.value)">
+                        <option value="small">360p</option>
+                        <option value="medium">480p</option>
+                        <option value="hd720">720p</option>
+                        <option value="hd1080">1080p</option>
+                    </select>
+
                     <span id="time-display" style="font-family:monospace; font-size:11px;">00:00:00 / 00:00:00</span>
                     <button class="fb-button" onclick="goFullscreen()" style="margin-left:auto;">FULL SCREEN</button>
                 </div>
@@ -79,6 +86,7 @@
     <script src="https://www.youtube.com/iframe_api"></script>
     <script>
         var player, portalData;
+        var targetRes = 'small'; // Global target for the Iron-Lock
         const wrapper = document.getElementById('master-player-wrapper');
 
         fetch('system.bin').then(res => res.text()).then(scrambled => {
@@ -118,10 +126,14 @@
         function toggle(id) { document.getElementById(id).classList.toggle('open'); }
 
         function handleSwitch(id, el) { 
-            // 360p Lock: v3.2.5 legacy logic
-            player.loadVideoById({'videoId': id, 'suggestedQuality': 'small'});
+            player.loadVideoById({'videoId': id, 'suggestedQuality': targetRes});
             document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
             el.classList.add('active');
+        }
+
+        function updateResolution(val) {
+            targetRes = val;
+            forceQuality(player);
         }
 
         function onYouTubeIframeAPIReady() {
@@ -130,30 +142,39 @@
                     clearInterval(waiter);
                     player = new YT.Player('player', {
                         videoId: portalData[0].b[0].u[0].v[0].i,
-                        playerVars: { 
-                            'controls': 0, 
-                            'modestbranding': 1, 
-                            'rel': 0, 
-                            'enablejsapi': 1,
-                            'vq': 'small' // Priority lock
-                        },
+                        playerVars: { 'controls': 0, 'modestbranding': 1, 'rel': 0, 'enablejsapi': 1, 'vq': targetRes },
                         events: { 
-                            'onReady': (e) => { 
-                                e.target.setPlaybackQuality('small'); // Handshake force
-                                updateTitle(); 
-                            },
-                            'onStateChange': (e) => {
-                                // Aggressive 360p Lock Patch:
-                                if (e.data == YT.PlayerState.PLAYING) {
-                                    e.target.setPlaybackQuality('small');
-                                }
+                            'onReady': (e) => { forceQuality(e.target); updateTitle(); },
+                            'onStateChange': (e) => { 
+                                if (e.data == YT.PlayerState.PLAYING) { forceQuality(e.target); }
                                 updateTitle(); 
                             }
                         }
                     });
                 }
             }, 100);
+
+            // QUALITY MONITOR: Checks every 3 seconds
+            setInterval(() => {
+                if(player && player.getPlaybackQuality) {
+                    let q = player.getPlaybackQuality();
+                    if(q !== targetRes && q !== 'unknown') {
+                        forceQuality(player);
+                    }
+                }
+            }, 3000);
+
             setInterval(updateUI, 1000); 
+        }
+
+        function forceQuality(p) {
+            if(!p || !p.setPlaybackQuality) return;
+            p.setPlaybackQuality(targetRes);
+            if(p.getPlaybackQuality() !== targetRes) {
+                const now = p.getCurrentTime();
+                const id = p.getVideoData().video_id;
+                p.loadVideoById({'videoId': id, 'startSeconds': now, 'suggestedQuality': targetRes});
+            }
         }
 
         function updateUI() { 
