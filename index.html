@@ -2,9 +2,11 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>theeternalladder v3.3.17</title>
+    <title>theeternalladder v4.2.0</title>
+    <script src="sys-render-min.js"></script>
+    
     <style>
-        /* ORIGINAL 2000s THEME */
+        /* CORE THEME */
         body { background-color: #f7f7f7; color: #333; font-family: "lucida grande", tahoma, verdana, arial, sans-serif; margin: 0; padding: 0; font-size: 11px; overflow-x: hidden; }
         .header { background-color: #3b5998; padding: 8px 15px; color: white; border-bottom: 1px solid #29487d; display: flex; align-items: flex-end; justify-content: space-between; }
         .header h1 { font-size: 18px; margin: 0; letter-spacing: -1px; font-weight: bold; }
@@ -13,8 +15,7 @@
         /* SIDEBAR ENGINE */
         .sidebar { width: 250px; flex-shrink: 0; max-height: 85vh; overflow-y: auto; user-select: none; }
         .side-box { background: white; border: 1px solid #d8dfea; margin-bottom: 5px; border-radius: 2px; overflow: hidden; }
-        .subject-header { background: #eceff5; padding: 10px; color: #3b5998; font-weight: bold; border-bottom: 1px solid #d8dfea; font-size: 12px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
-        .subject-header:hover { background: #dbe2ef; }
+        .subject-header { background: #eceff5; padding: 10px; color: #3b5998; font-weight: bold; border-bottom: 1px solid #d8dfea; font-size: 12px; cursor: pointer; display: flex; justify-content: space-between; }
         .batch-content { display: none; background: #fff; }
         .batch-content.open { display: block; }
         .batch-group { border-bottom: 1px solid #f0f0f0; }
@@ -22,11 +23,11 @@
         .unit-content { display: none; padding-bottom: 5px; }
         .unit-content.open { display: block; }
         .unit-title { padding: 5px 20px; color: #3b5998; font-style: italic; font-weight: bold; font-size: 10px; cursor: pointer; border-left: 3px solid #d8dfea; }
-        .nav-link { display: block; color: #3b5998; text-decoration: none; padding: 4px 5px 4px 35px; cursor: pointer; border-left: 2px solid transparent; }
+        .nav-link { display: block; color: #3b5998; text-decoration: none; padding: 4px 5px 4px 35px; cursor: pointer; }
         .nav-link:hover { background-color: #eff2f7; text-decoration: underline; }
         .nav-link.active { background-color: #3b5998; color: white !important; font-weight: bold; border-left: 2px solid #29487d; }
 
-        /* PLAYER CORE */
+        /* PLAYER WRAPPER */
         #master-player-wrapper { display: none; position: relative; background: #fff; flex-grow: 1; border: 1px solid #d8dfea; flex-direction: column; outline: none; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
         .video-title-bar { background: #eceff5; border-bottom: 1px solid #d8dfea; padding: 10px 12px; z-index: 100; transition: transform 0.4s, opacity 0.4s; }
         .video-title-bar h2 { margin: 0; font-size: 13px; color: #3b5998; font-weight: bold; }
@@ -40,55 +41,53 @@
         .fb-button { background: #3b5998; color: white; border: 1px solid #29487d; padding: 4px 10px; font-size: 10px; font-weight: bold; cursor: pointer; }
         .res-sel { background: #fff; color: #3b5998; border: 1px solid #3b5998; padding: 3px; font-size: 10px; font-weight: bold; cursor: pointer; }
 
-        /* FULLSCREEN STEALTH CLASSES */
-        #master-player-wrapper:fullscreen .video-title-bar { position: absolute; top: 0; width: 100%; background: rgba(236,239,245,0.9); box-sizing: border-box; }
-        #master-player-wrapper:fullscreen .floating-ui { position: absolute; bottom: 0; width: 100%; background: rgba(236,239,245,0.9); box-sizing: border-box; }
-        
+        /* STEALTH FULLSCREEN */
+        #master-player-wrapper:fullscreen .video-title-bar, 
+        #master-player-wrapper:fullscreen .floating-ui { position: absolute; width: 100%; background: rgba(236,239,245,0.9); box-sizing: border-box; }
+        #master-player-wrapper:fullscreen .video-title-bar { top: 0; }
+        #master-player-wrapper:fullscreen .floating-ui { bottom: 0; }
         #master-player-wrapper.ui-hidden { cursor: none; }
         #master-player-wrapper.ui-hidden .video-title-bar { transform: translateY(-100%); opacity: 0; }
         #master-player-wrapper.ui-hidden .floating-ui { transform: translateY(100%); opacity: 0; }
 
-        /* BRANDED WELCOME */
+        /* WELCOME PORTAL */
         #welcome-portal { flex-grow: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #fff; border: 1px solid #d8dfea; text-align: center; }
         .welcome-box { padding: 40px; border: 1px double #d8dfea; background: #fcfcfc; }
         .welcome-box h2 { color: #3b5998; font-size: 24px; margin: 0 0 10px 0; letter-spacing: -1.5px; }
-        .welcome-box p { color: #666; margin: 0; font-size: 12px; }
         .status-dot { height: 8px; width: 8px; background-color: #42b72a; border-radius: 50%; display: inline-block; margin-right: 5px; }
     </style>
 </head>
 <body oncontextmenu="return false;">
 
-    <div class="header"><h1>theeternalladder <span style="font-weight:normal; font-size:10px;">v3.3.17</span></h1></div>
+    <div id="_legacy_data" data-v="2026" style="display:none;"></div>
+
+    <div class="header"><h1>theeternalladder <span style="font-weight:normal; font-size:10px;">v4.2.0</span></h1></div>
 
     <div class="container">
-        <div class="sidebar" id="main-sidebar">Loading system...</div>
+        <div class="sidebar" id="main-sidebar">Initializing Cryptography...</div>
         
         <div id="welcome-portal">
             <div class="welcome-box">
                 <h2>theeternalladder</h2>
                 <p>Knowledge Management System</p>
                 <hr style="border:0; border-top: 1px solid #eee; margin: 15px 0;">
-                <p style="color: #999;"><span class="status-dot"></span> System Ready: Select a module to begin.</p>
+                <p style="color: #999;"><span class="status-dot"></span> Secure Connection Active</p>
             </div>
         </div>
 
         <div id="master-player-wrapper">
-            <div class="video-title-bar"><h2 id="current-video-title">Loading...</h2></div>
+            <div class="video-title-bar"><h2 id="current-video-title">...</h2></div>
             <div class="video-engine">
                 <div id="player"></div>
                 <div class="shield" onclick="playPause()"></div>
             </div>
-            
             <div class="floating-ui">
-                <div class="timeline-container" onclick="seek(event)">
-                    <div class="progress-bar" id="progress"></div>
-                </div>
+                <div class="timeline-container" onclick="seek(event)"><div class="progress-bar" id="progress"></div></div>
                 <div style="display:flex; align-items:center; gap:12px;">
                     <button class="fb-button" onclick="playPause()">PLAY / PAUSE</button>
-                    <select id="res-selector" class="res-sel" onchange="updateResolution(this.value)">
-                        <option value="small" selected>360p</option>
-                        <option value="medium">480p</option>
-                        <option value="hd720">720p</option>
+                    <select id="res-selector" class="res-sel" onchange="updateRes(this.value)">
+                        <option value="small">360p</option>
+                        <option value="hd720" selected>720p</option>
                         <option value="hd1080">1080p</option>
                     </select>
                     <span id="time-display" style="font-family:monospace; font-size:11px;">00:00:00 / 00:00:00</span>
@@ -100,45 +99,43 @@
 
     <script src="https://www.youtube.com/iframe_api"></script>
     <script>
+        // HORCRUX PART A: SHREDDED KEY [l,a,d,d,e,r]
+        const _0xPA = [108, 97, 100, 100, 101, 114];
         var player, portalData, hideTimeout;
-        var currentTargetRes = 'small';
-        
-        // Obfuscated Key Array: [l,a,d,d,e,r,2,0,2,5]
-        const _0x1f2b = [114, 101, 116, 105, 114, 101, 100, 99, 117, 112, 105, 100];
-        const _0x55a1 = _0x1f2b.map(c => String.fromCharCode(c)).join('');
+        var currentTargetRes = 'hd720';
 
         const wrapper = document.getElementById('master-player-wrapper');
         const welcome = document.getElementById('welcome-portal');
 
-        // XOR Logic
-        function _0x4a21(d, k) {
-            let o = "";
-            for (let i = 0; i < d.length; i++) {
-                o += String.fromCharCode(d.charCodeAt(i) ^ k.charCodeAt(i % k.length));
-            }
-            return o;
-        }
+        async function bootSystem() {
+    try {
+        // Hardcode the key here for a 1-second test
+        const MASTER = "ladder2026"; 
 
-        fetch('system.bin').then(res => res.text()).then(s => {
-            try {
-                const r = atob(s);
-                const d = _0x4a21(r, _0x55a1);
-                portalData = JSON.parse(decodeURIComponent(escape(d)));
-                buildSidebar();
-            } catch(e) { 
-                document.getElementById('main-sidebar').innerHTML = "ERR: SYS_INTEGRITY_FAIL";
-            }
-        });
+        const response = await fetch('system.bin');
+        const encrypted = await response.text();
+        
+        const bytes = CryptoJS.AES.decrypt(encrypted, MASTER);
+        const decrypted = bytes.toString(CryptoJS.enc.Utf8);
+        
+        if(!decrypted) throw new Error("Decryption returned empty");
+
+        portalData = JSON.parse(decrypted);
+        buildSidebar();
+    } catch(e) {
+        document.getElementById('main-sidebar').innerHTML = "KEY_MISMATCH_ERROR";
+    }
+}
 
         function buildSidebar() {
             const sb = document.getElementById('main-sidebar');
             let h = '';
             portalData.forEach((s, si) => {
-                h += `<div class="side-box"><div class="subject-header" onclick="toggle('sub-${si}')">${s.s}</div><div class="batch-content" id="sub-${si}">`;
+                h += `<div class="side-box"><div class="subject-header" onclick="toggle('s${si}')">${s.s}</div><div class="batch-content" id="s${si}">`;
                 s.b.forEach((b, bi) => {
-                    h += `<div class="batch-group"><div class="batch-title" onclick="toggle('bat-${si}-${bi}')">${b.y}</div><div class="unit-content" id="bat-${si}-${bi}">`;
+                    h += `<div class="batch-group"><div class="batch-title" onclick="toggle('b${si}${bi}')">${b.y}</div><div class="unit-content" id="b${si}${bi}">`;
                     b.u.forEach((u, ui) => {
-                        h += `<div class="unit-title" onclick="toggle('uni-${si}-${bi}-${ui}')">${u.n}</div><div class="unit-content" id="uni-${si}-${bi}-${ui}">`;
+                        h += `<div class="unit-title" onclick="toggle('u${si}${bi}${ui}')">${u.n}</div><div class="unit-content" id="u${si}${bi}${ui}">`;
                         u.v.forEach(v => {
                             h += `<div class="nav-link" id="nav-${v.i}" onclick="handleSwitch('${v.i}', this)">${v.t}</div>`;
                         });
@@ -161,16 +158,15 @@
             el.classList.add('active');
         }
 
-        function updateResolution(v) {
+        function updateRes(v) {
             currentTargetRes = v;
-            if(player && player.loadVideoById) {
-                const n = player.getCurrentTime(), i = player.getVideoData().video_id, p = (player.getPlayerState() === 1);
-                player.loadVideoById({'videoId': i, 'startSeconds': n, 'suggestedQuality': v});
-                if(!p) { setTimeout(() => { player.pauseVideo(); }, 500); }
-            }
+            const now = player.getCurrentTime();
+            const id = player.getVideoData().video_id;
+            player.loadVideoById({'videoId': id, 'startSeconds': now, 'suggestedQuality': v});
         }
 
         function onYouTubeIframeAPIReady() {
+            bootSystem();
             const w = setInterval(() => {
                 if(portalData) {
                     clearInterval(w);
@@ -218,8 +214,6 @@
             resetHideTimer();
             if (e.code === "Space") { e.preventDefault(); playPause(); }
             if (e.code === "KeyF") { e.preventDefault(); goFullscreen(); }
-            if (e.code === "ArrowRight") player.seekTo(player.getCurrentTime() + 10, true);
-            if (e.code === "ArrowLeft") player.seekTo(player.getCurrentTime() - 10, true);
         });
     </script>
 </body>
