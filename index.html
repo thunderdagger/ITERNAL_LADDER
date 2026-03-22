@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>theeternalladder v3.3.11</title>
+    <title>theeternalladder v3.3.12</title>
     <style>
         /* ORIGINAL 2000s THEME */
         body { background-color: #f7f7f7; color: #333; font-family: "lucida grande", tahoma, verdana, arial, sans-serif; margin: 0; padding: 0; font-size: 11px; overflow-x: hidden; }
@@ -10,6 +10,7 @@
         .header h1 { font-size: 18px; margin: 0; letter-spacing: -1px; font-weight: bold; }
         .container { display: flex; max-width: 1150px; margin: 20px auto; gap: 15px; padding: 0 10px; }
         
+        /* SIDEBAR ENGINE */
         .sidebar { width: 250px; flex-shrink: 0; max-height: 85vh; overflow-y: auto; user-select: none; }
         .side-box { background: white; border: 1px solid #d8dfea; margin-bottom: 5px; border-radius: 2px; overflow: hidden; }
         .subject-header { background: #eceff5; padding: 10px; color: #3b5998; font-weight: bold; border-bottom: 1px solid #d8dfea; font-size: 12px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
@@ -25,7 +26,8 @@
         .nav-link:hover { background-color: #eff2f7; text-decoration: underline; }
         .nav-link.active { background-color: #3b5998; color: white !important; font-weight: bold; border-left: 2px solid #29487d; }
 
-        #master-player-wrapper { position: relative; background: #fff; flex-grow: 1; border: 1px solid #d8dfea; display: flex; flex-direction: column; outline: none; overflow: hidden; }
+        /* PLAYER CORE */
+        #master-player-wrapper { position: relative; background: #fff; flex-grow: 1; border: 1px solid #d8dfea; display: flex; flex-direction: column; outline: none; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
         .video-title-bar { background: #eceff5; border-bottom: 1px solid #d8dfea; padding: 10px 12px; z-index: 100; }
         .video-title-bar h2 { margin: 0; font-size: 13px; color: #3b5998; font-weight: bold; }
         .video-engine { position: relative; width: 100%; aspect-ratio: 16/9; background: #000; z-index: 1; }
@@ -36,6 +38,7 @@
         .timeline-container { flex-grow: 1; background: #ccc; height: 10px; cursor: pointer; border: 1px solid #999; position: relative; overflow: hidden; margin-bottom: 8px; }
         .progress-bar { position: absolute; background: #3b5998; height: 100%; width: 0%; z-index: 2; }
         .fb-button { background: #3b5998; color: white; border: 1px solid #29487d; padding: 4px 10px; font-size: 10px; font-weight: bold; cursor: pointer; }
+        .fb-button:hover { background: #2d4373; }
         .res-sel { background: #fff; color: #3b5998; border: 1px solid #3b5998; padding: 3px; font-size: 10px; font-weight: bold; cursor: pointer; }
 
         #master-player-wrapper:fullscreen .video-title-bar { position: absolute; top: 0; width: 100%; background: rgba(236,239,245,0.9); }
@@ -44,7 +47,7 @@
 </head>
 <body oncontextmenu="return false;">
 
-    <div class="header"><h1>theeternalladder <span style="font-weight:normal; font-size:10px;">v3.3.11</span></h1></div>
+    <div class="header"><h1>theeternalladder <span style="font-weight:normal; font-size:10px;">v3.3.12</span></h1></div>
 
     <div class="container">
         <div class="sidebar" id="main-sidebar">Loading system...</div>
@@ -115,15 +118,31 @@
         function toggle(id) { document.getElementById(id).classList.toggle('open'); }
 
         function handleSwitch(id, el) { 
-            player.loadVideoById({'videoId': id, 'suggestedQuality': currentTargetRes});
+            player.loadVideoById({
+                'videoId': id, 
+                'suggestedQuality': currentTargetRes
+            });
             document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
             el.classList.add('active');
         }
 
         function updateResolution(val) {
             currentTargetRes = val;
-            if(player && player.setPlaybackQuality) {
-                player.setPlaybackQuality(val);
+            if(player && player.loadVideoById) {
+                const now = player.getCurrentTime();
+                const id = player.getVideoData().video_id;
+                const isPlaying = (player.getPlayerState() === 1);
+
+                // SOFT RE-SYNC: Force the server to look at the new resolution request
+                player.loadVideoById({
+                    'videoId': id,
+                    'startSeconds': now,
+                    'suggestedQuality': val
+                });
+
+                if(!isPlaying) {
+                    setTimeout(() => { player.pauseVideo(); }, 500);
+                }
             }
         }
 
