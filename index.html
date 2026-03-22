@@ -2,22 +2,26 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>theeternalladder v3.3.1</title>
+    <title>theeternalladder v3.3.3</title>
     <style>
-        /* RESTORED 2000s THEME - NO CHANGES */
+        /* ORIGINAL 2000s THEME - NO MODERN GRADIETS */
         body { background-color: #f7f7f7; color: #333; font-family: "lucida grande", tahoma, verdana, arial, sans-serif; margin: 0; padding: 0; font-size: 11px; overflow-x: hidden; }
         .header { background-color: #3b5998; padding: 8px 15px; color: white; border-bottom: 1px solid #29487d; display: flex; align-items: flex-end; justify-content: space-between; }
         .header h1 { font-size: 18px; margin: 0; letter-spacing: -1px; font-weight: bold; }
         .container { display: flex; max-width: 1150px; margin: 20px auto; gap: 15px; padding: 0 10px; }
         
-        /* SIDEBAR Logic */
+        /* SIDEBAR ENGINE */
         .sidebar { width: 250px; flex-shrink: 0; max-height: 85vh; overflow-y: auto; user-select: none; }
         .side-box { background: white; border: 1px solid #d8dfea; margin-bottom: 5px; border-radius: 2px; overflow: hidden; }
         .subject-header { background: #eceff5; padding: 10px; color: #3b5998; font-weight: bold; border-bottom: 1px solid #d8dfea; font-size: 12px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
+        .subject-header:hover { background: #dbe2ef; }
+        
         .batch-content { display: none; background: #fff; }
         .batch-content.open { display: block; }
         .batch-group { border-bottom: 1px solid #f0f0f0; }
         .batch-title { padding: 8px 10px; font-weight: bold; color: #666; font-size: 10px; text-transform: uppercase; cursor: pointer; background: #fafafa; }
+        .batch-title:hover { background: #f0f2f5; color: #3b5998; }
+
         .unit-content { display: none; padding-bottom: 5px; }
         .unit-content.open { display: block; }
         .unit-title { padding: 5px 20px; color: #3b5998; font-style: italic; font-weight: bold; font-size: 10px; cursor: pointer; border-left: 3px solid #d8dfea; }
@@ -26,32 +30,42 @@
         .nav-link:hover { background-color: #eff2f7; text-decoration: underline; }
         .nav-link.active { background-color: #3b5998; color: white !important; font-weight: bold; border-left: 2px solid #29487d; }
 
-        /* PLAYER - RESOURCE OPTIMIZED */
-        #master-player-wrapper { position: relative; background: #fff; flex-grow: 1; border: 1px solid #d8dfea; display: flex; flex-direction: column; outline: none; overflow: hidden; }
+        /* PLAYER CORE */
+        #master-player-wrapper { position: relative; background: #fff; flex-grow: 1; border: 1px solid #d8dfea; display: flex; flex-direction: column; outline: none; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
         .video-title-bar { background: #eceff5; border-bottom: 1px solid #d8dfea; padding: 10px 12px; z-index: 100; }
         .video-title-bar h2 { margin: 0; font-size: 13px; color: #3b5998; font-weight: bold; }
-        .video-engine { position: relative; width: 100%; aspect-ratio: 16/9; background: #000; }
-        #player { position: absolute; top: -55px; left: 0; width: 100%; height: calc(100% + 110px); pointer-events: none; }
-        .shield { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 50; }
+        .video-engine { position: relative; width: 100%; aspect-ratio: 16/9; background: #000; z-index: 1; }
         
-        .floating-ui { background: #eceff5; border-top: 1px solid #3b5998; padding: 10px; z-index: 100; }
+        /* YouTube Hack - Crop the controls */
+        #player { position: absolute; top: -55px; left: 0; width: 100%; height: calc(100% + 110px); pointer-events: none; }
+        .shield { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 50; cursor: pointer; }
+        
+        /* UI OVERLAY */
+        .floating-ui { background: #eceff5; border-top: 1px solid #3b5998; padding: 10px; z-index: 100; transition: 0.4s ease; }
         .timeline-container { flex-grow: 1; background: #ccc; height: 10px; cursor: pointer; border: 1px solid #999; position: relative; overflow: hidden; margin-bottom: 8px; }
         .progress-bar { position: absolute; background: #3b5998; height: 100%; width: 0%; z-index: 2; }
         .fb-button { background: #3b5998; color: white; border: 1px solid #29487d; padding: 4px 10px; font-size: 10px; font-weight: bold; cursor: pointer; }
+        .fb-button:hover { background: #2d4373; }
+        
+        /* Fullscreen UI handling */
+        #master-player-wrapper:fullscreen .video-title-bar { position: absolute; top: 0; width: 100%; background: rgba(236,239,245,0.9); }
+        #master-player-wrapper:fullscreen .floating-ui { position: absolute; bottom: 0; width: 100%; background: rgba(236,239,245,0.9); box-sizing: border-box; }
     </style>
 </head>
-<body>
+<body oncontextmenu="return false;">
 
-    <div class="header"><h1>theeternalladder <span style="font-weight:normal; font-size:10px;">v3.3.1</span></h1></div>
+    <div class="header"><h1>theeternalladder <span style="font-weight:normal; font-size:10px;">v3.3.3</span></h1></div>
 
     <div class="container">
         <div class="sidebar" id="main-sidebar">Loading system...</div>
-        <div id="master-player-wrapper" tabindex="0">
+        
+        <div id="master-player-wrapper">
             <div class="video-title-bar"><h2 id="current-video-title">Welcome</h2></div>
             <div class="video-engine">
                 <div id="player"></div>
-                <div class="shield"></div>
+                <div class="shield" onclick="playPause()"></div>
             </div>
+            
             <div class="floating-ui">
                 <div class="timeline-container" onclick="seek(event)">
                     <div class="progress-bar" id="progress"></div>
@@ -68,12 +82,15 @@
     <script src="https://www.youtube.com/iframe_api"></script>
     <script>
         var player, portalData;
-        
-        // GITHUB FETCH
+        const wrapper = document.getElementById('master-player-wrapper');
+
+        // GITHUB DEPLOYMENT FETCH
         fetch('system.bin').then(res => res.text()).then(scrambled => {
-            const decoded = decodeURIComponent(escape(atob(scrambled)));
-            portalData = JSON.parse(decoded);
-            buildSidebar();
+            try {
+                const decoded = decodeURIComponent(escape(atob(scrambled)));
+                portalData = JSON.parse(decoded);
+                buildSidebar();
+            } catch(e) { console.error("Data decode error."); }
         });
 
         function buildSidebar() {
@@ -105,10 +122,10 @@
         function toggle(id) { document.getElementById(id).classList.toggle('open'); }
 
         function handleSwitch(id, el) { 
-            player.loadVideoById({'videoId': id, 'suggestedQuality': 'small'}); // FORCED 360p (small)
+            // FORCE 360p stream
+            player.loadVideoById({'videoId': id, 'suggestedQuality': 'small'});
             document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
             el.classList.add('active');
-            wrapper.focus();
         }
 
         function onYouTubeIframeAPIReady() {
@@ -118,11 +135,13 @@
                     player = new YT.Player('player', {
                         videoId: portalData[0].b[0].u[0].v[0].i,
                         playerVars: { 'controls': 0, 'modestbranding': 1, 'rel': 0, 'enablejsapi': 1, 'vq': 'small' },
-                        events: { 'onReady': (e) => { e.target.setPlaybackQuality('small'); updateTitle(); } }
+                        events: { 
+                            'onReady': (e) => { e.target.setPlaybackQuality('small'); updateTitle(); },
+                            'onStateChange': () => { updateTitle(); }
+                        }
                     });
                 }
             }, 100);
-            // Resource optimization: Only poll UI every 1s
             setInterval(updateUI, 1000); 
         }
 
@@ -137,8 +156,27 @@
         function formatTime(t) { var h=Math.floor(t/3600), m=Math.floor((t%3600)/60), s=Math.floor(t%60); return (h<10?'0'+h:h)+":"+(m<10?'0'+m:m)+":"+(s<10?'0'+s:s); }
         function updateTitle() { try { document.getElementById('current-video-title').innerText = player.getVideoData().title; } catch(e){} }
         function playPause() { (player.getPlayerState()==1)?player.pauseVideo():player.playVideo(); }
-        function goFullscreen() { if(!document.fullscreenElement) wrapper.requestFullscreen(); else document.exitFullscreen(); }
+
+        // ROBUST FULLSCREEN ENGINE
+        function goFullscreen() {
+            if (!document.fullscreenElement && !document.webkitFullscreenElement) {
+                if (wrapper.requestFullscreen) wrapper.requestFullscreen();
+                else if (wrapper.webkitRequestFullscreen) wrapper.webkitRequestFullscreen();
+            } else {
+                if (document.exitFullscreen) document.exitFullscreen();
+                else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
+            }
+        }
+
         function seek(e) { var r = e.currentTarget.getBoundingClientRect(); player.seekTo(player.getDuration()*((e.clientX-r.left)/r.width), true); }
+
+        // KEYBOARD GLOBAL LISTENERS
+        window.addEventListener('keydown', (e) => {
+            if (e.code === "Space") { e.preventDefault(); playPause(); }
+            if (e.code === "KeyF") { e.preventDefault(); goFullscreen(); }
+            if (e.code === "ArrowRight") player.seekTo(player.getCurrentTime() + 10, true);
+            if (e.code === "ArrowLeft") player.seekTo(player.getCurrentTime() - 10, true);
+        });
     </script>
 </body>
 </html>
